@@ -152,7 +152,7 @@ test("submitLead posts JSON to the shared intake URL and reuses the body", async
   assert.equal(init?.headers?.["Content-Type"], "application/json");
   const sent = JSON.parse(String(init?.body));
   assert.equal(sent.submissionId, payload.submissionId);
-  assert.equal(sent.sourceSite, "https://plattform-kit.poc.singletonsd.com");
+  assert.equal(sent.sourceSite, "https://platform-kit.singletonsd.com");
   assert.equal(sent.formType, "contact");
   assert.equal(sent.product, "platform_kit");
 });

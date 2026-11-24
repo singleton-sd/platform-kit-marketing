@@ -16,7 +16,7 @@ and must not include private tracker references.
   `pnpm verify` on **pre-push**.
 - Keep the site fully static. Lead intake is a browser POST to
   `https://api.singletonsd.com/v1/leads`.
-- Public hostname: `https://plattform-kit.poc.singletonsd.com`.
+- Public hostname: `https://platform-kit.singletonsd.com`.
 
 Node `>=22.12.0`, pnpm `11.22.0` (`packageManager`). CI uses Node 24.
 

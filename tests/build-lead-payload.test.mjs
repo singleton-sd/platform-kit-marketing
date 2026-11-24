@@ -68,7 +68,7 @@ test("contact payload matches the job-kit schema keys and enums", () => {
     product: LEAD_PRODUCT,
     message: "Please get in touch.",
   });
-  assert.equal(LEAD_SOURCE_SITE, "https://plattform-kit.poc.singletonsd.com");
+  assert.equal(LEAD_SOURCE_SITE, "https://platform-kit.singletonsd.com");
   assert.equal(LEAD_PRODUCT, "platform_kit");
   assert.equal(payload.consent, true);
   assert.equal("source" in payload, false);

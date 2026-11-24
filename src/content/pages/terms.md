@@ -16,7 +16,7 @@ lawyer-reviewed legal advice and may be replaced with counsel-approved terms lat
 
 These Terms of Service ("Terms") are an agreement between you and Singleton SD ("we," "us,"
 or "our") governing access to Platform Kit at
-[plattform-kit.poc.singletonsd.com](https://plattform-kit.poc.singletonsd.com)
+[platform-kit.singletonsd.com](https://platform-kit.singletonsd.com)
 and
 [app.plattform-kit.poc.singletonsd.com](https://app.plattform-kit.poc.singletonsd.com)
 (the "Service").
@@ -131,4 +131,4 @@ them without restriction.
 Questions about these Terms: [hello@singletonsd.com](mailto:hello@singletonsd.com)
 
 Singleton SD · Platform Kit ·
-[plattform-kit.poc.singletonsd.com](https://plattform-kit.poc.singletonsd.com)
+[platform-kit.singletonsd.com](https://platform-kit.singletonsd.com)

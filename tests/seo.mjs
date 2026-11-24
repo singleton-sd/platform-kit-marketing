@@ -19,7 +19,7 @@ const privacyHtmlPath = new URL("privacy/index.html", distDir);
 const termsHtmlPath = new URL("terms/index.html", distDir);
 const homeMdPath = new URL("src/content/pages/home.md", repoRoot);
 
-const SITE_DOMAIN = "https://plattform-kit.poc.singletonsd.com";
+const SITE_DOMAIN = "https://platform-kit.singletonsd.com";
 
 function getTextBetween(haystack, startRegex, endRegex) {
   const start = haystack.match(startRegex);
@@ -113,19 +113,19 @@ testMetadata("Open Graph URL uses production domain", () => {
 testMetadata("sitemap lists primary public routes", () => {
   assert.match(
     sitemapXml,
-    /<loc>https:\/\/plattform-kit\.poc\.singletonsd\.com\/<\/loc>/,
+    /<loc>https:\/\/platform-kit\.singletonsd\.com\/<\/loc>/,
   );
   assert.match(
     sitemapXml,
-    /<loc>https:\/\/plattform-kit\.poc\.singletonsd\.com\/contact\/<\/loc>/,
+    /<loc>https:\/\/platform-kit\.singletonsd\.com\/contact\/<\/loc>/,
   );
   assert.match(
     sitemapXml,
-    /<loc>https:\/\/plattform-kit\.poc\.singletonsd\.com\/waitlist\/<\/loc>/,
+    /<loc>https:\/\/platform-kit\.singletonsd\.com\/waitlist\/<\/loc>/,
   );
   assert.match(
     sitemapXml,
-    /<loc>https:\/\/plattform-kit\.poc\.singletonsd\.com\/features\/<\/loc>/,
+    /<loc>https:\/\/platform-kit\.singletonsd\.com\/features\/<\/loc>/,
   );
   assert.doesNotMatch(sitemapXml, /\/admin\//i);
 });
@@ -135,7 +135,7 @@ testMetadata("sitemap and robots reference production domain", () => {
   assert.match(robotsTxt, /Disallow:\s*\/admin\//i);
   assert.match(
     robotsTxt,
-    /Sitemap:\s*https:\/\/plattform-kit\.poc\.singletonsd\.com\/sitemap\.xml/,
+    /Sitemap:\s*https:\/\/platform-kit\.singletonsd\.com\/sitemap\.xml/,
   );
 });
 

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const distDir = path.join(repoRoot, "dist");
-const site = "https://plattform-kit.poc.singletonsd.com";
+const site = "https://platform-kit.singletonsd.com";
 
 const SKIP_FILES = new Set(["404.html"]);
 /** Utility routes that must not appear in the public sitemap. */
