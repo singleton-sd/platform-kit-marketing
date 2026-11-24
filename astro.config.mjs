@@ -13,7 +13,7 @@ const base = previewBase && previewBase.length > 0 ? previewBase : "/";
 
 // Astro static marketing site (GitHub Pages; PR previews set PREVIEW_BASE_PATH)
 export default defineConfig({
-  site: "https://platform-kit.singletonsd.com",
+  site: "https://plattform-kit.poc.singletonsd.com",
   base,
   output: "static",
   integrations: [

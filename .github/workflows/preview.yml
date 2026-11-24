@@ -159,7 +159,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           source-dir: dist
           preview-branch: gh-pages
-          pages-base-url: https://platform-kit.singletonsd.com
+          pages-base-url: https://plattform-kit.poc.singletonsd.com
           umbrella-dir: pr-preview
           comment: false
       - name: Retry deploy preview
@@ -169,7 +169,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           source-dir: dist
           preview-branch: gh-pages
-          pages-base-url: https://platform-kit.singletonsd.com
+          pages-base-url: https://plattform-kit.poc.singletonsd.com
           umbrella-dir: pr-preview
           comment: false
 
@@ -194,8 +194,8 @@ jobs:
       - name: Build sticky preview comment
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
-          PREVIEW_URL: https://platform-kit.singletonsd.com/pr-preview/pr-${{ github.event.number }}/
-          VISUAL_URL: https://platform-kit.singletonsd.com/pr-preview/pr-${{ github.event.number }}/visual/
+          PREVIEW_URL: https://plattform-kit.poc.singletonsd.com/pr-preview/pr-${{ github.event.number }}/
+          VISUAL_URL: https://plattform-kit.poc.singletonsd.com/pr-preview/pr-${{ github.event.number }}/visual/
         with:
           script: |
             const fs = require("node:fs");
@@ -251,8 +251,8 @@ jobs:
       - name: Update preview link in pull request body
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
-          PREVIEW_URL: https://platform-kit.singletonsd.com/pr-preview/pr-${{ github.event.number }}/
-          VISUAL_URL: https://platform-kit.singletonsd.com/pr-preview/pr-${{ github.event.number }}/visual/
+          PREVIEW_URL: https://plattform-kit.poc.singletonsd.com/pr-preview/pr-${{ github.event.number }}/
+          VISUAL_URL: https://plattform-kit.poc.singletonsd.com/pr-preview/pr-${{ github.event.number }}/visual/
         with:
           script: |
             const markerStart = "<!-- platform-kit-preview:start -->";
@@ -460,7 +460,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           source-dir: dist
           preview-branch: gh-pages
-          pages-base-url: https://platform-kit.singletonsd.com
+          pages-base-url: https://plattform-kit.poc.singletonsd.com
           umbrella-dir: pr-preview
           comment: false
       - name: Retry remove preview
@@ -470,7 +470,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           source-dir: dist
           preview-branch: gh-pages
-          pages-base-url: https://platform-kit.singletonsd.com
+          pages-base-url: https://plattform-kit.poc.singletonsd.com
           umbrella-dir: pr-preview
           comment: false
 

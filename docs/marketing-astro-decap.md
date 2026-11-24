@@ -1,6 +1,6 @@
 # Marketing site — Astro + Decap
 
-Locked stack for `platform-kit.singletonsd.com` (GitHub Pages; house pattern matches [`poc-inkads-marketing`](https://github.com/singleton-sd/poc-inkads-marketing)).
+Locked stack for `plattform-kit.poc.singletonsd.com` (GitHub Pages; house pattern matches [`poc-inkads-marketing`](https://github.com/singleton-sd/poc-inkads-marketing)).
 
 ## Stack
 
@@ -80,7 +80,7 @@ Pin the Decap version when changing overrides. Do not float `@^3.0.0`.
 
 PK consumes the org cms-auth gateway at `https://api.singletonsd.com`. Do not add `/auth` or `/callback` in this repo. The OAuth callback (`https://api.singletonsd.com/v1/cms-auth/callback`) is configured on the gateway and GitHub OAuth App.
 
-The gateway must allow `https://platform-kit.singletonsd.com` for Decap OAuth and lead-form origin before `/admin` and forms work on this host. That allowlist change is a separate api-gateway PR. OAuth scope is `public_repo`. Do not assume other hosts (localhost, `*.azurestaticapps.net`, or `*.github.io`) are allowed.
+The gateway allowlist currently includes `https://plattform-kit.poc.singletonsd.com`. OAuth scope is `public_repo`. Do not assume other hosts (localhost, `*.azurestaticapps.net`, or `*.github.io`) are allowed.
 
 GitHub OAuth App: [Singleton SD CMS OAuth](https://github.com/settings/applications/3783537) (callback `https://api.singletonsd.com/v1/cms-auth/callback`). Do **not** create a Platform Kit OAuth App.
 
@@ -106,7 +106,7 @@ server in this repo.
 ### Human bootstrap (once)
 
 1. Confirm the gateway auth route: opening `/admin` starts a popup to `https://api.singletonsd.com/v1/cms-auth/auth`.
-2. Open `https://platform-kit.singletonsd.com/admin` → Login with GitHub (custom domain only).
+2. Open `https://plattform-kit.poc.singletonsd.com/admin` → Login with GitHub (custom domain only).
 
 Editors need **write** access to `singleton-sd/platform-kit-marketing`.
 

@@ -220,7 +220,7 @@ try {
   assert.equal(successPosts[0].method, "POST");
   assert.match(successPosts[0].contentType, /application\/json/);
   const sent = successPosts[0].body;
-  assert.equal(sent.sourceSite, "https://platform-kit.singletonsd.com");
+  assert.equal(sent.sourceSite, "https://plattform-kit.poc.singletonsd.com");
   assert.equal(sent.formType, "contact");
   assert.equal(sent.product, "platform_kit");
   assert.equal(sent.name, "Ada Lovelace");

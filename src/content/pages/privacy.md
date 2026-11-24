@@ -15,7 +15,7 @@ lawyer-reviewed legal advice and may be replaced with counsel-approved terms lat
 ## 1. Introduction
 
 Singleton SD ("we," "our," or "us") operates Platform Kit available at
-[platform-kit.singletonsd.com](https://platform-kit.singletonsd.com)
+[plattform-kit.poc.singletonsd.com](https://plattform-kit.poc.singletonsd.com)
 and
 [app.plattform-kit.poc.singletonsd.com](https://app.plattform-kit.poc.singletonsd.com)
 (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard
@@ -42,7 +42,7 @@ We store content and records you create or manage through the Service, such as:
 ### Marketing contact and waitlist
 
 When you submit the public contact or waitlist form on
-[platform-kit.singletonsd.com](https://platform-kit.singletonsd.com),
+[plattform-kit.poc.singletonsd.com](https://plattform-kit.poc.singletonsd.com),
 we collect:
 
 1. Name, email address, and optional company and phone
@@ -53,7 +53,7 @@ we collect:
    site key, and origin. The token is verified server-side and is not stored after
    that check. See Cloudflare's
    [Turnstile Privacy Addendum](https://www.cloudflare.com/turnstile-privacy-policy/).
-5. Source site and page (`https://platform-kit.singletonsd.com` and the form path)
+5. Source site and page (`https://plattform-kit.poc.singletonsd.com` and the form path)
 
 Consent is recorded as version `platform-kit-privacy-v1`. Submissions are posted
 from your browser to Singleton SD's shared lead-intake API and stored in our CRM
@@ -155,4 +155,4 @@ where permitted by law.
 Privacy inquiries: [hello@singletonsd.com](mailto:hello@singletonsd.com)
 
 Singleton SD · Platform Kit ·
-[platform-kit.singletonsd.com](https://platform-kit.singletonsd.com)
+[plattform-kit.poc.singletonsd.com](https://plattform-kit.poc.singletonsd.com)
