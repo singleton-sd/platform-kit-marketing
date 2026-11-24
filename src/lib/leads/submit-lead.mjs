@@ -265,7 +265,7 @@ export async function submitLead(payload, options = {}) {
       signal: controller?.signal,
       body,
     });
-    let parsed = null;
+    let parsed;
     try {
       parsed = await response.json();
     } catch {

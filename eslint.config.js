@@ -15,6 +15,14 @@ export default [
     languageOptions: { globals: globals.node },
   },
   {
+    files: ["src/lib/leads/bind-lead-form.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+  {
     ignores: [".astro/**", "dist/**", "visual-base/**", "test-results/**"],
   },
 ];
