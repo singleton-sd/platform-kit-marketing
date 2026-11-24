@@ -1,10 +1,17 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import {
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import {
   checkBuiltAssetPaths,
+  checkDistNoJekyll,
   checkPrefixedPath,
   findAssetPathErrors,
 } from "../scripts/check-asset-paths.mjs";
@@ -68,6 +75,7 @@ test("checkBuiltAssetPaths walks a dist tree", () => {
       join(root, "features/index.html"),
       '<html><a href="/features">self</a><img src="/images/x.png"/></html>',
     );
+    writeFileSync(join(root, ".nojekyll"), "");
     assert.deepEqual(checkBuiltAssetPaths({ dir: root, base: "/" }), []);
 
     const previewRoot = mkdtempSync(join(tmpdir(), "mkt-assets-preview-"));
@@ -76,6 +84,7 @@ test("checkBuiltAssetPaths walks a dist tree", () => {
         join(previewRoot, "index.html"),
         '<html><link href="/pr-preview/pr-4/_astro/index.css"/><script src="/pr-preview/pr-4/_astro/index.js"></script><a href="/pr-preview/pr-4/features">F</a></html>',
       );
+      writeFileSync(join(previewRoot, ".nojekyll"), "");
       assert.deepEqual(
         checkBuiltAssetPaths({ dir: previewRoot, base: "/pr-preview/pr-4/" }),
         [],
@@ -88,4 +97,47 @@ test("checkBuiltAssetPaths walks a dist tree", () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test("checkDistNoJekyll fails when the marker is missing", () => {
+  const root = mkdtempSync(join(tmpdir(), "mkt-nojekyll-"));
+  try {
+    assert.match(checkDistNoJekyll(root)[0] ?? "", /\.nojekyll/);
+    writeFileSync(join(root, ".nojekyll"), "");
+    assert.deepEqual(checkDistNoJekyll(root), []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("checkBuiltAssetPaths fails when dist/.nojekyll is missing", () => {
+  const root = mkdtempSync(join(tmpdir(), "mkt-nojekyll-html-"));
+  try {
+    writeFileSync(
+      join(root, "index.html"),
+      '<html><link href="/_astro/index.css"/><script src="/_astro/index.js"></script></html>',
+    );
+    const errors = checkBuiltAssetPaths({ dir: root, base: "/" });
+    assert.ok(errors.some((line) => line.includes(".nojekyll")));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("Pages workflows keep hidden dist files and recreate .nojekyll", () => {
+  const pages = readFileSync(
+    new URL("../.github/workflows/pages.yml", import.meta.url),
+    "utf8",
+  );
+  const preview = readFileSync(
+    new URL("../.github/workflows/preview.yml", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(pages, /path:\s*dist\n\s*include-hidden-files:\s*true/);
+  assert.match(preview, /path:\s*dist\n\s*include-hidden-files:\s*true/);
+  assert.match(pages, /touch dist\/\.nojekyll/);
+  assert.match(preview, /touch dist\/\.nojekyll/);
+  assert.match(pages, /test -f dist\/\.nojekyll/);
+  assert.match(preview, /test -f dist\/\.nojekyll/);
 });

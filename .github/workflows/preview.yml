@@ -97,11 +97,14 @@ jobs:
         run: |
           rm -rf dist/visual
           cp -R test-results/visual dist/visual
+      - name: Require dist/.nojekyll
+        run: test -f dist/.nojekyll
       - name: Upload visual screenshots
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: visual-pr-${{ github.event.number }}
           path: test-results/visual
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
       - name: Upload preview dist
@@ -109,6 +112,7 @@ jobs:
         with:
           name: preview-dist
           path: dist
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 1
 
@@ -131,6 +135,11 @@ jobs:
         with:
           name: preview-dist
           path: dist
+      - name: Ensure dist/.nojekyll exists
+        run: |
+          mkdir -p dist
+          touch dist/.nojekyll
+          test -f dist/.nojekyll
       - name: Mint GitHub App token
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0

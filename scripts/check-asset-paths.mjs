@@ -6,7 +6,7 @@
  * Usage:
  *   node scripts/check-asset-paths.mjs [--dir dist] [--base /]
  */
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeBase } from "../src/lib/with-base.mjs";
@@ -137,7 +137,26 @@ export function checkBuiltAssetPaths({ dir, base }) {
     );
   }
 
+  errors.push(...checkDistNoJekyll(dir));
+
   return errors;
+}
+
+/**
+ * GitHub Pages runs Jekyll unless dist/.nojekyll is present, which hides
+ * underscore-prefixed folders such as `_astro/` (CSS and JS 404).
+ *
+ * @param {string} dir
+ * @returns {string[]}
+ */
+export function checkDistNoJekyll(dir) {
+  const marker = join(dir, ".nojekyll");
+  if (!existsSync(marker)) {
+    return [
+      `Missing ${marker}: GitHub Pages would run Jekyll and drop _astro/ CSS and JS`,
+    ];
+  }
+  return [];
 }
 
 const isDirectRun = process.argv[1]
