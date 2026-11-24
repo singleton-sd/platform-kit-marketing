@@ -34,14 +34,18 @@ test("Decap CMS admin script is version-pinned", async () => {
   assert.doesNotMatch(html, /decap-cms@\^/);
 });
 
-test("Decap backend still points at the source repo until the Decap commit", async () => {
+test("Decap pages collection targets this repo at the site root", async () => {
   const config = await readFile(
     new URL("public/admin/config.yml", root),
     "utf8",
   );
 
   assert.match(config, /name: pages/);
-  assert.match(config, /repo: singleton-sd\/poc-plattform-kit/);
+  assert.match(config, /repo: singleton-sd\/platform-kit-marketing/);
+  assert.doesNotMatch(config, /poc-plattform-kit/);
+  assert.match(config, /folder: src\/content\/pages/);
+  assert.match(config, /media_folder: public\/uploads/);
   assert.match(config, /base_url: https:\/\/api\.singletonsd\.com/);
   assert.match(config, /auth_endpoint: v1\/cms-auth\/auth/);
+  assert.match(config, /branch: main/);
 });

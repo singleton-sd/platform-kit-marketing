@@ -6,9 +6,9 @@ const rootDir = fileURLToPath(new URL("..", import.meta.url));
 const outPath = path.join(rootDir, "public/admin/config.yml");
 
 /** GitHub repo Decap commits to. Commit E points this at the standalone site. */
-const BACKEND_REPO = "singleton-sd/poc-plattform-kit";
-const MEDIA_FOLDER = "apps/marketing/public/uploads";
-const PAGES_FOLDER = "apps/marketing/src/content/pages";
+const BACKEND_REPO = "singleton-sd/platform-kit-marketing";
+const MEDIA_FOLDER = "public/uploads";
+const PAGES_FOLDER = "src/content/pages";
 
 const config = `# Decap CMS — git-backed editor for marketing Markdown.
 # Auth: org cms-auth gateway at https://api.singletonsd.com

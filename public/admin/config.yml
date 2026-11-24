@@ -4,7 +4,7 @@
 # Docs: docs/marketing-astro-decap.md
 backend:
   name: github
-  repo: singleton-sd/poc-plattform-kit
+  repo: singleton-sd/platform-kit-marketing
   branch: main
   base_url: https://api.singletonsd.com
   auth_endpoint: v1/cms-auth/auth
@@ -19,13 +19,13 @@ logo:
 site_url: https://plattform-kit.poc.singletonsd.com
 display_url: https://plattform-kit.poc.singletonsd.com
 
-media_folder: apps/marketing/public/uploads
+media_folder: public/uploads
 public_folder: /uploads
 
 collections:
   - name: pages
     label: Pages
-    folder: apps/marketing/src/content/pages
+    folder: src/content/pages
     create: true
     delete: false
     slug: "{{slug}}"

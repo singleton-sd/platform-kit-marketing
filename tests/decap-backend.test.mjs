@@ -93,7 +93,9 @@ test('Decap backend points at the api.singletonsd.com cms-auth gateway', () => {
   const yaml = readFileSync(configPath, 'utf8');
   const fields = parseBackendFields(yaml);
   assert.equal(fields.name, 'github');
-  assert.equal(fields.repo, 'singleton-sd/poc-plattform-kit');
+  assert.equal(fields.repo, 'singleton-sd/platform-kit-marketing');
+  assert.notEqual(fields.repo, 'singleton-sd/poc-plattform-kit');
+  assert.doesNotMatch(yaml, /singleton-sd\/poc-plattform-kit/);
   assert.equal(fields.branch, 'main');
   assert.equal(fields.base_url, 'https://api.singletonsd.com');
   assert.equal(fields.auth_endpoint, 'v1/cms-auth/auth');
@@ -102,14 +104,14 @@ test('Decap backend points at the api.singletonsd.com cms-auth gateway', () => {
 test('parseBackendFields treats quoted YAML scalars as unquoted strings', () => {
   const fields = parseBackendFields(`backend:
   name: github
-  repo: "singleton-sd/poc-plattform-kit"
+  repo: "singleton-sd/platform-kit-marketing"
   branch: 'main'
   base_url: "https://api.singletonsd.com"
   auth_endpoint: 'v1/cms-auth/auth'
 `);
   assert.equal(fields.base_url, 'https://api.singletonsd.com');
   assert.equal(fields.auth_endpoint, 'v1/cms-auth/auth');
-  assert.equal(fields.repo, 'singleton-sd/poc-plattform-kit');
+  assert.equal(fields.repo, 'singleton-sd/platform-kit-marketing');
   assert.equal(fields.branch, 'main');
 });
 
