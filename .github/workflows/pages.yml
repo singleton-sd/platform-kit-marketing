@@ -1,0 +1,105 @@
+# Build is unauthenticated (contents: read, no secrets). Deploy checks out
+# for JamesIves (needs a git directory), downloads dist, then mints the
+# singleton-release App token as its last setup step and deploys with that
+# token only — never GITHUB_TOKEN.
+name: Deploy production GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm format:check
+      - name: Lint and type-check
+        run: pnpm lint
+      - name: Run tests
+        run: pnpm test
+      - name: Require Turnstile site key
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+        run: |
+          if [ -z "${PUBLIC_TURNSTILE_SITE_KEY:-}" ]; then
+            echo "::error::Set repository variable PUBLIC_TURNSTILE_SITE_KEY (public site key only)."
+            exit 1
+          fi
+      - name: Build production site
+        run: pnpm build
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+      - name: Install Playwright browsers
+        run: pnpm playwright:install
+      - name: SEO metadata checks
+        run: pnpm test:seo
+      - name: Accessibility checks
+        run: pnpm test:a11y
+      - name: Upload production dist
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pages-dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download production dist
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: pages-dist
+          path: dist
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: singleton-sd
+          repositories: platform-kit-marketing
+          permission-contents: write
+      - name: Deploy production site
+        uses: JamesIves/github-pages-deploy-action@d92aa235d04922e8f08b40ce78cc5442fcfbfa2f # v4.8.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          branch: gh-pages
+          folder: dist
+          clean: true
+          clean-exclude: pr-preview
