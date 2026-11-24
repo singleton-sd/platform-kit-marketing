@@ -117,6 +117,29 @@ const browser = await chromium.launch();
 const context = await browser.newContext({
   viewport: { width: 1280, height: 720 },
 });
+// Forms always load Turnstile; abort off-origin requests so networkidle is
+// reachable in CI (Cloudflare never settles on the static test server).
+await context.addInitScript(() => {
+  window.turnstile = {
+    render(container, options) {
+      if (container instanceof HTMLElement) {
+        container.dataset.turnstileStub = "true";
+      }
+      queueMicrotask(() => options?.callback?.("a11y-turnstile-token"));
+      return "a11y-stub";
+    },
+    reset() {},
+    remove() {},
+  };
+});
+await context.route("**/*", async (route) => {
+  const url = route.request().url();
+  if (url.startsWith(baseUrl)) {
+    await route.continue();
+    return;
+  }
+  await route.abort();
+});
 const page = await context.newPage();
 
 try {

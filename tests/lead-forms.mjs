@@ -304,7 +304,11 @@ try {
       !document.querySelector("#contact-form button[type=submit]")?.disabled,
   );
   await page.locator("#contact-form button[type=submit]").click();
-  await page.waitForSelector("#contact-form-error:not(.hidden)");
+  await page.waitForFunction(() =>
+    /Lead intake is temporarily unavailable/.test(
+      document.getElementById("contact-form-error")?.innerText ?? "",
+    ),
+  );
   assert.match(
     await page.locator("#contact-form-error").innerText(),
     /Lead intake is temporarily unavailable/,
