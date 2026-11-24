@@ -16,8 +16,8 @@ logo:
   src: /admin/brand-mark.svg
   show_in_header: true
 
-site_url: https://platform-kit.singletonsd.com
-display_url: https://platform-kit.singletonsd.com
+site_url: https://plattform-kit.poc.singletonsd.com
+display_url: https://plattform-kit.poc.singletonsd.com
 
 media_folder: public/uploads
 public_folder: /uploads

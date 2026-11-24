@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://platform-kit.singletonsd.com/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/about/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/about/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/changelog/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/changelog/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/contact/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/contact/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/features/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/features/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/pricing/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/pricing/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/privacy/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/privacy/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/terms/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/terms/</loc>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://platform-kit.singletonsd.com/waitlist/</loc>
+    <loc>https://plattform-kit.poc.singletonsd.com/waitlist/</loc>
     <changefreq>monthly</changefreq>
   </url>
 </urlset>
