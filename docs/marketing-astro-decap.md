@@ -6,13 +6,13 @@ Locked stack for `plattform-kit.poc.singletonsd.com` (GitHub Pages; house patter
 
 | Layer | Choice |
 | --- | --- |
-| SSG | **Astro** (`apps/marketing`) — Markdown → static `dist/` |
+| SSG | **Astro** (repo root) — Markdown → static `dist/` |
 | Styling | **Tailwind 3** + `@singleton-sd/tokens` (`--ssd-*` CSS; npm, not the token CDN) |
-| Content | Markdown collections under `apps/marketing/src/content/pages/` |
+| Content | Markdown collections under `src/content/pages/` |
 | Non-dev editor | **Decap CMS** static UI at `/admin` (GitHub backend) |
 | OAuth login | Shared org **cms-auth** gateway (`https://api.singletonsd.com`, `auth_endpoint: v1/cms-auth/auth`). This repo is **not** the org Decap OAuth provider. |
-| Contact email | Shared [`PostKit`](https://github.com/singleton-sd/post-kit) API via `PUBLIC_POSTKIT_API_BASE_URL` |
-| Deploy site | `pages.yml` → `gh-pages` branch (GitHub Pages). PRs: `preview-marketing.yml` at `/pr-preview/pr-<n>/` |
+| Lead intake | Browser `POST` to `https://api.singletonsd.com/v1/leads` |
+| Deploy site | `pages.yml` → `gh-pages` branch (GitHub Pages). PRs: `preview.yml` at `/pr-preview/pr-<n>/` |
 
 No WordPress, Gatsby, or always-on CMS server for the site itself.
 
@@ -20,15 +20,12 @@ No WordPress, Gatsby, or always-on CMS server for the site itself.
 
 Astro emits directory URLs (`features/index.html`) and `/404.html`. GitHub Pages
 serves `/features` and `/features/` from the directory index, and unknown paths
-at the **site root** from `/404.html`. There is no marketing
-`staticwebapp.config.json`. Product-app SWA config (`apps/web/public/staticwebapp.config.json`)
-is unchanged.
+at the **site root** from `/404.html`.
 
 PR previews set `PREVIEW_BASE_PATH=/pr-preview/pr-<n>/` so bundled `_astro/`
 assets and in-app links resolve under that subpath. Decap `/admin` keeps
 production-absolute `/admin/…` URLs — use the custom domain for CMS login, not
-a preview URL. See [`docs/dns-route53.md`](./dns-route53.md) for cutover and
-documented Pages gaps.
+a preview URL.
 
 ## How Decap fits Astro
 
@@ -77,7 +74,7 @@ Pin the Decap version when changing overrides. Do not float `@^3.0.0`.
 | Markdown content | No — GitHub |
 | Astro site | No — CI build + GitHub Pages |
 | GitHub OAuth login | **Yes** — shared org gateway `https://api.singletonsd.com/v1/cms-auth` |
-| Marketing Contact HTTP | **Yes** — shared PostKit API |
+| Marketing lead HTTP | **Yes** — shared `https://api.singletonsd.com/v1/leads` |
 
 ### Decap OAuth (shared)
 
@@ -94,27 +91,24 @@ Open `/admin` only on a hostname allowed by the gateway origin list. Do **not** 
 ```yaml
 backend:
   name: github
-  repo: singleton-sd/poc-plattform-kit
+  repo: singleton-sd/platform-kit-marketing
   branch: main
   base_url: https://api.singletonsd.com
   auth_endpoint: v1/cms-auth/auth
 ```
 
-### Contact email (PostKit)
+### Lead intake
 
-| Path | Role |
-| --- | --- |
-| `/contact` | Anonymous marketing Contact form (`POST` / `OPTIONS`) → PostKit |
-
-Astro Contact posts to `{PUBLIC_POSTKIT_API_BASE_URL}/contact`. PostKit owns validation, rate limiting, tenant/host profiles, and email delivery.
+Contact and waitlist forms `POST` JSON to `https://api.singletonsd.com/v1/leads`
+(job-kit contract). Cloudflare Turnstile runs in the browser. There is no
+server in this repo.
 
 ### Human bootstrap (once)
 
 1. Confirm the gateway auth route: opening `/admin` starts a popup to `https://api.singletonsd.com/v1/cms-auth/auth`.
-2. Confirm PostKit `/health` returns 200 and its origin allowlist includes `plattform-kit.poc.singletonsd.com`.
-3. Open `https://plattform-kit.poc.singletonsd.com/admin` → Login with GitHub (custom domain only).
+2. Open `https://plattform-kit.poc.singletonsd.com/admin` → Login with GitHub (custom domain only).
 
-Editors need **write** access to `singleton-sd/poc-plattform-kit`.
+Editors need **write** access to `singleton-sd/platform-kit-marketing`.
 
 ## Content model
 
@@ -133,22 +127,9 @@ root 404 handler — not a homepage SPA fallback.
 
 ## Repo paths
 
-- App: `apps/marketing`
-- Admin: `apps/marketing/public/admin/`
+- App: repository root
+- Admin: `public/admin/`
 - Shared Decap OAuth: `https://api.singletonsd.com/v1/cms-auth` (org cms-auth gateway)
-- Shared Contact email: [`singleton-sd/post-kit`](https://github.com/singleton-sd/post-kit)
-- Deploy site: `.github/workflows/pages.yml` (production) / `.github/workflows/preview-marketing.yml` (PR previews)
-- Local marketing: `pnpm dev:marketing`
-
-## ClickUp
-
-Ops via **REST** (`CLICKUP_API_TOKEN` env) — not MCP for routine ops.
-
-| Item | Link |
-| --- | --- |
-| Ops list | https://app.clickup.com/90161394355/v/li/901616287298 |
-| Astro + Decap site | https://app.clickup.com/t/86d3z0mfz |
-| Architecture Doc page | https://app.clickup.com/90161394355/docs/2kz0kcnk-1416/2kz0kcnk-2876 |
-| Site PR | https://github.com/singleton-sd/poc-plattform-kit/pull/61 |
-
-Related: [Marketing: Privacy + Terms pages](https://app.clickup.com/t/86d3yr2a8) — legal copy folded into Markdown.
+- Lead intake: `https://api.singletonsd.com/v1/leads`
+- Deploy site: `.github/workflows/pages.yml` (production) / `.github/workflows/preview.yml` (PR previews)
+- Local: `pnpm dev`
