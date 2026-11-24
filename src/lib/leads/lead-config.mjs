@@ -6,7 +6,7 @@
 export const LEAD_INTAKE_URL = "https://api.singletonsd.com/v1/leads";
 
 /** Gateway + job-kit Origin / sourceSite allowlist entry for this site. */
-export const LEAD_SOURCE_SITE = "https://plattform-kit.poc.singletonsd.com";
+export const LEAD_SOURCE_SITE = "https://platform-kit.singletonsd.com";
 
 /** JSON `product` slug. Twenty stores PLATFORM_KIT; the HTTP body uses this value. */
 export const LEAD_PRODUCT = "platform_kit";
