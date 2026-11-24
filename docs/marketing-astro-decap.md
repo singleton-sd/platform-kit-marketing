@@ -4,15 +4,15 @@ Locked stack for `plattform-kit.poc.singletonsd.com` (GitHub Pages; house patter
 
 ## Stack
 
-| Layer | Choice |
-| --- | --- |
-| SSG | **Astro** (repo root) — Markdown → static `dist/` |
-| Styling | **Tailwind 3** + `@singleton-sd/tokens` (`--ssd-*` CSS; npm, not the token CDN) |
-| Content | Markdown collections under `src/content/pages/` |
-| Non-dev editor | **Decap CMS** static UI at `/admin` (GitHub backend) |
-| OAuth login | Shared org **cms-auth** gateway (`https://api.singletonsd.com`, `auth_endpoint: v1/cms-auth/auth`). This repo is **not** the org Decap OAuth provider. |
-| Lead intake | Browser `POST` to `https://api.singletonsd.com/v1/leads` |
-| Deploy site | `pages.yml` → `gh-pages` branch (GitHub Pages). PRs: `preview.yml` at `/pr-preview/pr-<n>/` |
+| Layer          | Choice                                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| SSG            | **Astro** (repo root) — Markdown → static `dist/`                                                                                                      |
+| Styling        | **Tailwind 3** + `@singleton-sd/tokens` (`--ssd-*` CSS; npm, not the token CDN)                                                                        |
+| Content        | Markdown collections under `src/content/pages/`                                                                                                        |
+| Non-dev editor | **Decap CMS** static UI at `/admin` (GitHub backend)                                                                                                   |
+| OAuth login    | Shared org **cms-auth** gateway (`https://api.singletonsd.com`, `auth_endpoint: v1/cms-auth/auth`). This repo is **not** the org Decap OAuth provider. |
+| Lead intake    | Browser `POST` to `https://api.singletonsd.com/v1/leads`                                                                                               |
+| Deploy site    | `pages.yml` → `gh-pages` branch (GitHub Pages). PRs: `preview.yml` at `/pr-preview/pr-<n>/`                                                            |
 
 No WordPress, Gatsby, or always-on CMS server for the site itself.
 
@@ -46,21 +46,21 @@ class names can change across releases.
 
 Supported Decap hooks we use:
 
-| Hook | File / config |
-| --- | --- |
-| CDN install (pinned) | `public/admin/index.html` → `decap-cms@3.15.1` (no `^`) |
-| `logo` / `show_in_header` | `public/admin/config.yml` + `brand-mark.svg` |
-| `CMS.registerPreviewStyle` | `admin-preview.js` → `/admin/preview.css` |
-| `CMS.registerPreviewTemplate('pages')` | `admin-preview.js` |
-| Built-in widgets + hints | `config.yml` fields |
+| Hook                                   | File / config                                           |
+| -------------------------------------- | ------------------------------------------------------- |
+| CDN install (pinned)                   | `public/admin/index.html` → `decap-cms@3.15.1` (no `^`) |
+| `logo` / `show_in_header`              | `public/admin/config.yml` + `brand-mark.svg`            |
+| `CMS.registerPreviewStyle`             | `admin-preview.js` → `/admin/preview.css`               |
+| `CMS.registerPreviewTemplate('pages')` | `admin-preview.js`                                      |
+| Built-in widgets + hints               | `config.yml` fields                                     |
 
 Product theme layers:
 
-| Layer | Role |
-| --- | --- |
-| `admin.css` | Maintainer-endorsed CSS overrides (solid `--pk-*` surfaces, nav vs CTA, editor) |
+| Layer            | Role                                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| `admin.css`      | Maintainer-endorsed CSS overrides (solid `--pk-*` surfaces, nav vs CTA, editor)                |
 | `admin-theme.js` | Unofficial Emotion hex remapper for `styles.js` `colorsRaw` leftovers; re-runs on `hashchange` |
-| `preview.css` | Preview iframe only (official `registerPreviewStyle` target) |
+| `preview.css`    | Preview iframe only (official `registerPreviewStyle` target)                                   |
 
 `astro.config.mjs` copies `@singleton-sd/tokens` CSS into `public/admin/tokens/` so the static admin SPA can `@import` it (no token CDN).
 
@@ -68,13 +68,13 @@ Pin the Decap version when changing overrides. Do not float `@^3.0.0`.
 
 ### Hosting
 
-| Piece | Extra host? |
-| --- | --- |
-| Decap UI `/admin` | No — same GitHub Pages site |
-| Markdown content | No — GitHub |
-| Astro site | No — CI build + GitHub Pages |
-| GitHub OAuth login | **Yes** — shared org gateway `https://api.singletonsd.com/v1/cms-auth` |
-| Marketing lead HTTP | **Yes** — shared `https://api.singletonsd.com/v1/leads` |
+| Piece               | Extra host?                                                            |
+| ------------------- | ---------------------------------------------------------------------- |
+| Decap UI `/admin`   | No — same GitHub Pages site                                            |
+| Markdown content    | No — GitHub                                                            |
+| Astro site          | No — CI build + GitHub Pages                                           |
+| GitHub OAuth login  | **Yes** — shared org gateway `https://api.singletonsd.com/v1/cms-auth` |
+| Marketing lead HTTP | **Yes** — shared `https://api.singletonsd.com/v1/leads`                |
 
 ### Decap OAuth (shared)
 
@@ -118,12 +118,12 @@ Home stays on `/` via `src/pages/index.astro`; every other slug is built by
 Unknown paths hit `src/pages/404.astro` (`404.html`) via GitHub Pages’
 root 404 handler — not a homepage SPA fallback.
 
-| File | Purpose |
-| --- | --- |
-| `src/content/pages/home.md` | Landing brand, headline, CTA, body |
-| `src/content/pages/privacy.md` | Privacy Policy |
-| `src/content/pages/terms.md` | Terms of Service |
-| `src/content/pages/<slug>.md` | Any additional page editors create in `/admin` |
+| File                           | Purpose                                        |
+| ------------------------------ | ---------------------------------------------- |
+| `src/content/pages/home.md`    | Landing brand, headline, CTA, body             |
+| `src/content/pages/privacy.md` | Privacy Policy                                 |
+| `src/content/pages/terms.md`   | Terms of Service                               |
+| `src/content/pages/<slug>.md`  | Any additional page editors create in `/admin` |
 
 ## Repo paths
 

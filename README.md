@@ -24,13 +24,13 @@ cp .env.example .env
 
 ## Scripts
 
-| Script | Purpose |
-| --- | --- |
-| `pnpm dev` | Astro dev server |
-| `pnpm build` | Type-check, static build, sitemap, asset-path check |
-| `pnpm preview` | Serve `dist/` |
-| `pnpm test` | Unit tests under `tests/*.test.mjs` |
-| `pnpm verify` | Format, lint, unit tests, build, SEO, a11y |
+| Script         | Purpose                                             |
+| -------------- | --------------------------------------------------- |
+| `pnpm dev`     | Astro dev server                                    |
+| `pnpm build`   | Type-check, static build, sitemap, asset-path check |
+| `pnpm preview` | Serve `dist/`                                       |
+| `pnpm test`    | Unit tests under `tests/*.test.mjs`                 |
+| `pnpm verify`  | Format, lint, unit tests, build, SEO, a11y          |
 
 Production deploys from `main` via `.github/workflows/pages.yml` onto the
 `gh-pages` branch. PR previews land under `/pr-preview/pr-<n>/` on the same

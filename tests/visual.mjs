@@ -286,16 +286,20 @@ async function screenshotPage(
 
 async function waitForWaitlistForm(page) {
   await page.locator("#waitlist-form").waitFor();
-  await page.locator("#waitlist-form button[type='submit']:not([disabled])").waitFor({
-    timeout: 15_000,
-  });
+  await page
+    .locator("#waitlist-form button[type='submit']:not([disabled])")
+    .waitFor({
+      timeout: 15_000,
+    });
 }
 
 async function waitForContactForm(page) {
   await page.locator("#contact-form").waitFor();
-  await page.locator("#contact-form button[type='submit']:not([disabled])").waitFor({
-    timeout: 15_000,
-  });
+  await page
+    .locator("#contact-form button[type='submit']:not([disabled])")
+    .waitFor({
+      timeout: 15_000,
+    });
 }
 
 function ensureWaitlistDist() {
@@ -512,9 +516,7 @@ const stateCaptures = [
       await page.locator("#waitlist-feature").selectOption("early_access");
       await page.locator("#waitlist-consent").check();
       await page.locator("#waitlist-form button[type='submit']").click();
-      await page
-        .locator("#waitlist-success:not(.hidden)")
-        .waitFor();
+      await page.locator("#waitlist-success:not(.hidden)").waitFor();
     },
   },
   {

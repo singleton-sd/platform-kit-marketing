@@ -1,4 +1,4 @@
-import type { IconName } from './icons';
+import type { IconName } from "./icons";
 
 export type FeatureItem = {
   title: string;
@@ -15,5 +15,5 @@ export type PricingTier = {
   features: string[];
   cta: { label: string; href: string };
   highlighted?: boolean;
-  ctaVariant?: 'primary' | 'outline' | 'ghost';
+  ctaVariant?: "primary" | "outline" | "ghost";
 };

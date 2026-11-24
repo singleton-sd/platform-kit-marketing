@@ -6,15 +6,15 @@ interface Props {
 }
 
 const {
-  monthlyLabel = 'Monthly Billing',
-  yearlyLabel = 'Yearly (Save 15%)',
-  class: className = '',
+  monthlyLabel = "Monthly Billing",
+  yearlyLabel = "Yearly (Save 15%)",
+  class: className = "",
 } = Astro.props;
 ---
 
 <div
   class:list={[
-    'inline-flex items-center gap-1 rounded-full border border-border bg-bg-muted p-1',
+    "inline-flex items-center gap-1 rounded-full border border-border bg-bg-muted p-1",
     className,
   ]}
   data-pricing-toggle
@@ -39,30 +39,33 @@ const {
 
 <script>
   function bindPricingToggle() {
-    document.querySelectorAll('[data-pricing-toggle]').forEach((root) => {
-      if (!(root instanceof HTMLElement) || root.dataset.bound === 'true') return;
-      root.dataset.bound = 'true';
-      const buttons = root.querySelectorAll('[data-pricing-period]');
+    document.querySelectorAll("[data-pricing-toggle]").forEach((root) => {
+      if (!(root instanceof HTMLElement) || root.dataset.bound === "true")
+        return;
+      root.dataset.bound = "true";
+      const buttons = root.querySelectorAll("[data-pricing-period]");
       buttons.forEach((button) => {
         if (!(button instanceof HTMLButtonElement)) return;
-        button.addEventListener('click', () => {
-          const period = button.dataset.pricingPeriod ?? 'monthly';
+        button.addEventListener("click", () => {
+          const period = button.dataset.pricingPeriod ?? "monthly";
           buttons.forEach((candidate) => {
             if (!(candidate instanceof HTMLButtonElement)) return;
             const active = candidate === button;
-            candidate.setAttribute('aria-pressed', String(active));
-            candidate.classList.toggle('bg-accent', active);
-            candidate.classList.toggle('text-accent-on', active);
-            candidate.classList.toggle('font-semibold', active);
-            candidate.classList.toggle('text-fg-muted', !active);
-            candidate.classList.toggle('font-medium', !active);
+            candidate.setAttribute("aria-pressed", String(active));
+            candidate.classList.toggle("bg-accent", active);
+            candidate.classList.toggle("text-accent-on", active);
+            candidate.classList.toggle("font-semibold", active);
+            candidate.classList.toggle("text-fg-muted", !active);
+            candidate.classList.toggle("font-medium", !active);
           });
-          document.dispatchEvent(new CustomEvent('pricing:period', { detail: { period } }));
-          document.querySelectorAll('[data-price-monthly]').forEach((node) => {
+          document.dispatchEvent(
+            new CustomEvent("pricing:period", { detail: { period } }),
+          );
+          document.querySelectorAll("[data-price-monthly]").forEach((node) => {
             if (!(node instanceof HTMLElement)) return;
-            const monthly = node.dataset.priceMonthly ?? '';
+            const monthly = node.dataset.priceMonthly ?? "";
             const yearly = node.dataset.priceYearly ?? monthly;
-            node.textContent = period === 'yearly' ? yearly : monthly;
+            node.textContent = period === "yearly" ? yearly : monthly;
           });
         });
       });
@@ -70,5 +73,5 @@ const {
   }
 
   bindPricingToggle();
-  document.addEventListener('astro:page-load', bindPricingToggle);
+  document.addEventListener("astro:page-load", bindPricingToggle);
 </script>

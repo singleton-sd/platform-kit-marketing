@@ -1,8 +1,8 @@
 ---
-import Button from '../ui/Button.astro';
-import Icon from '../ui/Icon.astro';
-import { appCta, primaryNav } from '../../lib/nav';
-import { stripBase, withBase } from '../../lib/with-base.mjs';
+import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
+import { appCta, primaryNav } from "../../lib/nav";
+import { stripBase, withBase } from "../../lib/with-base.mjs";
 
 interface Props {
   currentPath?: string;
@@ -11,22 +11,27 @@ interface Props {
 }
 
 const {
-  currentPath = '/',
-  brand = 'Platform Kit',
-  tagline = 'Singleton SD',
+  currentPath = "/",
+  brand = "Platform Kit",
+  tagline = "Singleton SD",
 } = Astro.props;
 
 function isActive(href: string) {
   const path = stripBase(currentPath);
   const target = stripBase(href);
-  if (target === '/') return path === '/';
+  if (target === "/") return path === "/";
   return path === target || path.startsWith(`${target}/`);
 }
 ---
 
 <header class="sticky top-0 z-40 border-b border-border bg-bg">
-  <div class="mx-auto flex h-14 max-w-content items-center justify-between px-5 md:h-16 md:px-10">
-    <a href={withBase('/')} class="flex items-center gap-2 text-body-sm no-underline">
+  <div
+    class="mx-auto flex h-14 max-w-content items-center justify-between px-5 md:h-16 md:px-10"
+  >
+    <a
+      href={withBase("/")}
+      class="flex items-center gap-2 text-body-sm no-underline"
+    >
       <span class="font-bold text-fg">{brand}</span>
       <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
       <span class="hidden text-caption text-fg-muted sm:inline">{tagline}</span>
@@ -40,12 +45,12 @@ function isActive(href: string) {
             <a
               href={withBase(link.href)}
               class:list={[
-                'relative text-body-sm no-underline transition',
+                "relative text-body-sm no-underline transition",
                 active
-                  ? 'font-semibold text-accent'
-                  : 'font-medium text-fg hover:text-accent',
+                  ? "font-semibold text-accent"
+                  : "font-medium text-fg hover:text-accent",
               ]}
-              aria-current={active ? 'page' : undefined}
+              aria-current={active ? "page" : undefined}
             >
               {link.label}
               {active ? (
@@ -84,7 +89,9 @@ function isActive(href: string) {
     <div class="flex h-full flex-col justify-between p-6">
       <div class="flex flex-col gap-8">
         <div class="flex items-center justify-between">
-          <a href={withBase('/')} class="font-bold text-fg no-underline">{brand}</a>
+          <a href={withBase("/")} class="font-bold text-fg no-underline"
+            >{brand}</a
+          >
           <button
             type="button"
             class="inline-flex size-10 items-center justify-center rounded-md text-fg"
@@ -101,10 +108,10 @@ function isActive(href: string) {
                 <a
                   href={withBase(link.href)}
                   class:list={[
-                    'font-heading text-[1.625rem] leading-tight no-underline',
-                    active ? 'text-accent' : 'text-fg',
+                    "font-heading text-[1.625rem] leading-tight no-underline",
+                    active ? "text-accent" : "text-fg",
                   ]}
-                  aria-current={active ? 'page' : undefined}
+                  aria-current={active ? "page" : undefined}
                 >
                   {link.label}
                 </a>
@@ -120,25 +127,29 @@ function isActive(href: string) {
 
 <script>
   function bindMobileNav() {
-    const root = document.querySelector('[data-mobile-nav]');
-    const toggle = document.querySelector('[data-mobile-nav-toggle]');
-    const close = document.querySelector('[data-mobile-nav-close]');
-    if (!(root instanceof HTMLElement) || !(toggle instanceof HTMLButtonElement)) return;
+    const root = document.querySelector("[data-mobile-nav]");
+    const toggle = document.querySelector("[data-mobile-nav-toggle]");
+    const close = document.querySelector("[data-mobile-nav-close]");
+    if (
+      !(root instanceof HTMLElement) ||
+      !(toggle instanceof HTMLButtonElement)
+    )
+      return;
 
     const setOpen = (open: boolean) => {
       root.hidden = !open;
-      root.classList.toggle('hidden', !open);
-      toggle.setAttribute('aria-expanded', String(open));
-      document.body.style.overflow = open ? 'hidden' : '';
+      root.classList.toggle("hidden", !open);
+      toggle.setAttribute("aria-expanded", String(open));
+      document.body.style.overflow = open ? "hidden" : "";
     };
 
-    toggle.addEventListener('click', () => setOpen(true));
-    close?.addEventListener('click', () => setOpen(false));
-    root.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => setOpen(false));
+    toggle.addEventListener("click", () => setOpen(true));
+    close?.addEventListener("click", () => setOpen(false));
+    root.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
     });
   }
 
   bindMobileNav();
-  document.addEventListener('astro:page-load', bindMobileNav);
+  document.addEventListener("astro:page-load", bindMobileNav);
 </script>

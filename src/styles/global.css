@@ -3,14 +3,14 @@
    Package semantic text tokens are brand yellow (gallery/poster). Product
    surfaces keep gray body copy + yellow brand so marketing body text meets
    contrast. Local aliases exist only where the package has no token. */
-@import '@singleton-sd/tokens/css/light';
-@import '@singleton-sd/tokens/css/dark';
+@import "@singleton-sd/tokens/css/light";
+@import "@singleton-sd/tokens/css/dark";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-[data-theme='light'] {
+[data-theme="light"] {
   --ssd-color-text-default: var(--ssd-color-gray-900);
   --ssd-color-text-muted: var(--ssd-color-gray-600);
   --ssd-color-text-subtle: var(--ssd-color-gray-400);
@@ -34,12 +34,15 @@
   --pk-hero: var(--ssd-color-yellow-light-100);
   --pk-accent-muted: var(--ssd-color-yellow-light-300);
   --pk-accent-bg: var(--ssd-color-yellow-light-100);
-  --shadow-sm: 0 2px 4px color-mix(in srgb, var(--ssd-color-text-default) 10%, transparent);
-  --shadow-md: 0 4px 8px color-mix(in srgb, var(--ssd-color-text-default) 12%, transparent);
-  --shadow-lg: 0 12px 24px color-mix(in srgb, var(--ssd-color-text-default) 15%, transparent);
+  --shadow-sm: 0 2px 4px
+    color-mix(in srgb, var(--ssd-color-text-default) 10%, transparent);
+  --shadow-md: 0 4px 8px
+    color-mix(in srgb, var(--ssd-color-text-default) 12%, transparent);
+  --shadow-lg: 0 12px 24px
+    color-mix(in srgb, var(--ssd-color-text-default) 15%, transparent);
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --ssd-color-text-default: var(--ssd-color-gray-100);
   --ssd-color-text-muted: var(--ssd-color-gray-400);
   --ssd-color-text-subtle: var(--ssd-color-gray-600);
@@ -63,15 +66,19 @@
   --pk-hero: var(--ssd-color-yellow-light-900);
   --pk-accent-muted: var(--ssd-color-yellow-light-700);
   --pk-accent-bg: var(--ssd-color-yellow-light-900);
-  --shadow-sm: 0 2px 4px color-mix(in srgb, var(--ssd-color-gray-900) 45%, transparent);
-  --shadow-md: 0 4px 8px color-mix(in srgb, var(--ssd-color-gray-900) 50%, transparent);
-  --shadow-lg: 0 12px 24px color-mix(in srgb, var(--ssd-color-gray-900) 55%, transparent);
+  --shadow-sm: 0 2px 4px
+    color-mix(in srgb, var(--ssd-color-gray-900) 45%, transparent);
+  --shadow-md: 0 4px 8px
+    color-mix(in srgb, var(--ssd-color-gray-900) 50%, transparent);
+  --shadow-lg: 0 12px 24px
+    color-mix(in srgb, var(--ssd-color-gray-900) 55%, transparent);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: var(--ssd-font-family-body), ui-sans-serif, system-ui, sans-serif;
+  font-family:
+    var(--ssd-font-family-body), ui-sans-serif, system-ui, sans-serif;
   background-color: var(--ssd-color-background-default);
   color: var(--ssd-color-text-default);
 }
@@ -114,7 +121,7 @@ body {
 }
 
 .prose-legal ul > li::before {
-  content: '';
+  content: "";
   @apply absolute left-1 top-2.5 size-1.5 rounded-full bg-accent;
 }
 

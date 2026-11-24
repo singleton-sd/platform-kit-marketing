@@ -14,31 +14,33 @@ interface Props {
 }
 
 const {
-  label = 'Logical tenant isolation schematic',
+  label = "Logical tenant isolation schematic",
   tenants = [
-    { name: 'Tenant_01', db: 'isolated_db_A', meta: 'USA East Node' },
+    { name: "Tenant_01", db: "isolated_db_A", meta: "USA East Node" },
     {
-      name: 'Tenant_02',
-      db: 'isolated_db_B',
-      meta: 'Active Session',
+      name: "Tenant_02",
+      db: "isolated_db_B",
+      meta: "Active Session",
       active: true,
     },
-    { name: 'Tenant_03', db: 'isolated_db_C', meta: 'EU West Node' },
+    { name: "Tenant_03", db: "isolated_db_C", meta: "EU West Node" },
   ],
-  layerLabel = 'Unified Router & Auth Isolation Token Layer',
-  class: className = '',
+  layerLabel = "Unified Router & Auth Isolation Token Layer",
+  class: className = "",
 } = Astro.props;
 ---
 
 <div
   class:list={[
-    'flex flex-col items-center justify-center gap-5 rounded-xl border border-border bg-bg-muted p-6 md:p-8',
+    "flex flex-col items-center justify-center gap-5 rounded-xl border border-border bg-bg-muted p-6 md:p-8",
     className,
   ]}
   role="img"
   aria-label={label}
 >
-  <p class="m-0 text-center text-[11px] font-bold uppercase tracking-wide text-fg-subtle">
+  <p
+    class="m-0 text-center text-[11px] font-bold uppercase tracking-wide text-fg-subtle"
+  >
     {label}
   </p>
   <div class="grid w-full gap-4 sm:grid-cols-3">
@@ -46,10 +48,10 @@ const {
       tenants.map((tenant) => (
         <div
           class:list={[
-            'flex flex-col gap-2 rounded-md border bg-bg p-4',
+            "flex flex-col gap-2 rounded-md border bg-bg p-4",
             tenant.active
-              ? 'border-2 border-accent shadow-md shadow-accent/15'
-              : 'border-border',
+              ? "border-2 border-accent shadow-md shadow-accent/15"
+              : "border-border",
           ]}
         >
           <div class="flex items-center gap-1.5">
@@ -62,16 +64,16 @@ const {
           <hr class="m-0 border-0 border-t border-border" />
           <p
             class:list={[
-              'm-0 text-xs',
-              tenant.active ? 'font-semibold text-fg' : 'text-fg-muted',
+              "m-0 text-xs",
+              tenant.active ? "font-semibold text-fg" : "text-fg-muted",
             ]}
           >
             {tenant.db}
           </p>
           <p
             class:list={[
-              'm-0 text-[10px]',
-              tenant.active ? 'text-accent' : 'text-fg-subtle',
+              "m-0 text-[10px]",
+              tenant.active ? "text-accent" : "text-fg-subtle",
             ]}
           >
             {tenant.meta}

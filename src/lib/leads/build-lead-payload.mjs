@@ -13,7 +13,7 @@ import {
   LEAD_TURNSTILE_TOKEN_MAX,
   LEAD_WEBSITE_MAX,
   utf8ByteLength,
-} from './lead-config.mjs';
+} from "./lead-config.mjs";
 
 /**
  * @typedef {'contact' | 'waitlist'} LeadFormType
@@ -46,7 +46,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * @returns {string | undefined}
  */
 function optionalTrimmed(value, max) {
-  if (typeof value !== 'string') return undefined;
+  if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   if (!trimmed) return undefined;
   return trimmed.slice(0, max);
@@ -58,7 +58,7 @@ function optionalTrimmed(value, max) {
  * @returns {string}
  */
 function requiredTrimmed(value, max) {
-  if (typeof value !== 'string') return '';
+  if (typeof value !== "string") return "";
   return value.trim().slice(0, max);
 }
 
@@ -68,7 +68,7 @@ function requiredTrimmed(value, max) {
  * @returns {string}
  */
 export function normaliseEmail(value) {
-  if (typeof value !== 'string') return '';
+  if (typeof value !== "string") return "";
   return value.trim().toLowerCase().slice(0, LEAD_EMAIL_MAX);
 }
 
@@ -81,25 +81,26 @@ export function validateLeadValues(formType, values) {
   /** @type {Record<string, string>} */
   const errors = {};
   const name = requiredTrimmed(values.name, LEAD_NAME_MAX);
-  if (!name) errors.name = 'Enter your first and last name.';
+  if (!name) errors.name = "Enter your first and last name.";
 
   const email = normaliseEmail(values.email);
   if (!email || !EMAIL_PATTERN.test(email)) {
-    errors.email = 'Enter a valid email address.';
+    errors.email = "Enter a valid email address.";
   }
 
-  if (formType === 'contact') {
+  if (formType === "contact") {
     const message = requiredTrimmed(values.message, LEAD_MESSAGE_MAX);
-    if (!message) errors.message = 'Enter a message.';
+    if (!message) errors.message = "Enter a message.";
   }
 
-  if (formType === 'waitlist') {
+  if (formType === "waitlist") {
     const feature = optionalTrimmed(values.feature, LEAD_FEATURE_MAX);
-    if (!feature) errors.feature = 'Select what you want to join the waitlist for.';
+    if (!feature)
+      errors.feature = "Select what you want to join the waitlist for.";
   }
 
   if (values.consent !== true) {
-    errors.consent = 'Please accept the privacy notice.';
+    errors.consent = "Please accept the privacy notice.";
   }
 
   return errors;
@@ -142,8 +143,8 @@ export function buildLeadPayload(input) {
   if (feature) payload.feature = feature;
   if (website) payload.website = website;
 
-  if (formType === 'contact') {
-    payload.message = message ?? '';
+  if (formType === "contact") {
+    payload.message = message ?? "";
   } else if (message) {
     payload.message = message;
   }

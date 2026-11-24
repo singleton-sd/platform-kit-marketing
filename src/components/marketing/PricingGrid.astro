@@ -1,8 +1,8 @@
 ---
-import type { PricingTier } from '../../lib/marketing-types';
-import PageContainer from '../shell/PageContainer.astro';
-import PricingCard from './PricingCard.astro';
-import PricingToggle from './PricingToggle.astro';
+import type { PricingTier } from "../../lib/marketing-types";
+import PageContainer from "../shell/PageContainer.astro";
+import PricingCard from "./PricingCard.astro";
+import PricingToggle from "./PricingToggle.astro";
 
 interface Props {
   title?: string;
@@ -11,14 +11,16 @@ interface Props {
   class?: string;
 }
 
-const { title, tiers, showToggle = true, class: className = '' } = Astro.props;
+const { title, tiers, showToggle = true, class: className = "" } = Astro.props;
 ---
 
-<section class:list={['pb-16 md:pb-20', className]}>
+<section class:list={["pb-16 md:pb-20", className]}>
   <PageContainer>
     {
       title ? (
-        <h2 class="mb-8 m-0 text-center font-heading text-h2 text-fg">{title}</h2>
+        <h2 class="mb-8 m-0 text-center font-heading text-h2 text-fg">
+          {title}
+        </h2>
       ) : null
     }
     {

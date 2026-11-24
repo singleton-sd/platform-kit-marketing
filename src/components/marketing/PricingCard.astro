@@ -1,6 +1,6 @@
 ---
-import Button from '../ui/Button.astro';
-import Icon from '../ui/Icon.astro';
+import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
 
 interface Props {
   name: string;
@@ -11,7 +11,7 @@ interface Props {
   features: string[];
   cta: { label: string; href: string };
   highlighted?: boolean;
-  ctaVariant?: 'primary' | 'outline' | 'ghost';
+  ctaVariant?: "primary" | "outline" | "ghost";
   class?: string;
 }
 
@@ -19,22 +19,22 @@ const {
   name,
   price,
   priceYearly,
-  periodLabel = '/mo',
+  periodLabel = "/mo",
   description,
   features,
   cta,
   highlighted = false,
-  ctaVariant = highlighted ? 'primary' : 'outline',
-  class: className = '',
+  ctaVariant = highlighted ? "primary" : "outline",
+  class: className = "",
 } = Astro.props;
 
-const showPeriod = Boolean(periodLabel) && price !== 'Custom';
+const showPeriod = Boolean(periodLabel) && price !== "Custom";
 ---
 
 <article
   class:list={[
-    'flex h-full flex-col gap-8 rounded-xl border bg-bg p-8 shadow-sm',
-    highlighted ? 'border-2 border-accent shadow-md' : 'border-border',
+    "flex h-full flex-col gap-8 rounded-xl border bg-bg p-8 shadow-sm",
+    highlighted ? "border-2 border-accent shadow-md" : "border-border",
     className,
   ]}
 >
@@ -42,8 +42,8 @@ const showPeriod = Boolean(periodLabel) && price !== 'Custom';
     <div class="flex items-center justify-between gap-2">
       <h3
         class:list={[
-          'm-0 text-body-sm font-bold uppercase tracking-wide',
-          highlighted ? 'text-accent' : 'text-fg-muted',
+          "m-0 text-body-sm font-bold uppercase tracking-wide",
+          highlighted ? "text-accent" : "text-fg-muted",
         ]}
       >
         {name}
@@ -80,7 +80,9 @@ const showPeriod = Boolean(periodLabel) && price !== 'Custom';
       features.map((feature, index) => (
         <li class="flex items-start gap-3 text-body-sm text-fg">
           <Icon name="check" size={16} class="mt-0.5 shrink-0 text-accent" />
-          <span class:list={[highlighted && index === 0 ? 'font-semibold' : '']}>
+          <span
+            class:list={[highlighted && index === 0 ? "font-semibold" : ""]}
+          >
             {feature}
           </span>
         </li>

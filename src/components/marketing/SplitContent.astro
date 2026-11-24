@@ -1,7 +1,7 @@
 ---
-import Icon from '../ui/Icon.astro';
-import PageContainer from '../shell/PageContainer.astro';
-import { withBase } from '../../lib/with-base.mjs';
+import Icon from "../ui/Icon.astro";
+import PageContainer from "../shell/PageContainer.astro";
+import { withBase } from "../../lib/with-base.mjs";
 
 interface Props {
   eyebrow?: string;
@@ -11,7 +11,7 @@ interface Props {
   link?: { label: string; href: string };
   imageAlt?: string;
   imageSrc?: string;
-  imageLoading?: 'eager' | 'lazy';
+  imageLoading?: "eager" | "lazy";
   reverse?: boolean;
   class?: string;
 }
@@ -22,26 +22,28 @@ const {
   body,
   bullets = [],
   link,
-  imageAlt = 'Illustration',
+  imageAlt = "Illustration",
   imageSrc,
-  imageLoading = 'lazy',
+  imageLoading = "lazy",
   reverse = false,
-  class: className = '',
+  class: className = "",
 } = Astro.props;
 ---
 
-<section class:list={['py-16 md:py-24', className]}>
+<section class:list={["py-16 md:py-24", className]}>
   <PageContainer>
     <div
       class:list={[
-        'grid items-center gap-10 md:grid-cols-2 md:gap-16',
-        reverse ? 'md:[&>*:first-child]:order-2' : '',
+        "grid items-center gap-10 md:grid-cols-2 md:gap-16",
+        reverse ? "md:[&>*:first-child]:order-2" : "",
       ]}
     >
       <div class="space-y-4">
         {
           eyebrow ? (
-            <p class="m-0 text-body-sm font-bold uppercase tracking-wide text-accent">{eyebrow}</p>
+            <p class="m-0 text-body-sm font-bold uppercase tracking-wide text-accent">
+              {eyebrow}
+            </p>
           ) : null
         }
         <h2 class="m-0 font-heading text-h2 text-fg">{title}</h2>
@@ -51,7 +53,10 @@ const {
             <ul class="m-0 flex list-none flex-col gap-3 p-0">
               {bullets.map((item) => (
                 <li class="flex items-center gap-2 text-[15px] font-medium text-fg">
-                  <span class="size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                  <span
+                    class="size-1.5 shrink-0 rounded-full bg-accent"
+                    aria-hidden="true"
+                  />
                   {item}
                 </li>
               ))}

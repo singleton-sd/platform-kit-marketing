@@ -1,5 +1,5 @@
 ---
-import type { IconName } from '../../lib/icons';
+import type { IconName } from "../../lib/icons";
 import {
   LEAD_COMPANY_MAX,
   LEAD_EMAIL_MAX,
@@ -7,16 +7,16 @@ import {
   LEAD_MESSAGE_MAX,
   LEAD_NAME_MAX,
   LEAD_PHONE_MAX,
-} from '../../lib/leads/lead-config.mjs';
-import { withBase } from '../../lib/with-base.mjs';
-import Icon from '../ui/Icon.astro';
-import TextInput from '../ui/TextInput.astro';
-import Select from '../ui/Select.astro';
-import TextArea from '../ui/TextArea.astro';
-import Checkbox from '../ui/Checkbox.astro';
-import Button from '../ui/Button.astro';
-import Alert from '../ui/Alert.astro';
-import PageContainer from '../shell/PageContainer.astro';
+} from "../../lib/leads/lead-config.mjs";
+import { withBase } from "../../lib/with-base.mjs";
+import Icon from "../ui/Icon.astro";
+import TextInput from "../ui/TextInput.astro";
+import Select from "../ui/Select.astro";
+import TextArea from "../ui/TextArea.astro";
+import Checkbox from "../ui/Checkbox.astro";
+import Button from "../ui/Button.astro";
+import Alert from "../ui/Alert.astro";
+import PageContainer from "../shell/PageContainer.astro";
 
 interface ReachItem {
   label: string;
@@ -29,50 +29,56 @@ interface Props {
   class?: string;
 }
 
-const { class: className = '' } = Astro.props;
+const { class: className = "" } = Astro.props;
 
 const subjects = [
-  { value: 'general', label: 'General inquiry' },
-  { value: 'sales', label: 'Sales / demo request' },
-  { value: 'support', label: 'Technical support' },
-  { value: 'partnership', label: 'Partnership' },
+  { value: "general", label: "General inquiry" },
+  { value: "sales", label: "Sales / demo request" },
+  { value: "support", label: "Technical support" },
+  { value: "partnership", label: "Partnership" },
 ];
 const messageMaxLength =
-  LEAD_MESSAGE_MAX - Math.max(...subjects.map((subject) => `[${subject.label}]\n\n`.length));
+  LEAD_MESSAGE_MAX -
+  Math.max(...subjects.map((subject) => `[${subject.label}]\n\n`.length));
 
 const reachItems: ReachItem[] = [
   {
-    label: 'Email Support',
-    value: 'support@singletonsd.com',
-    href: 'mailto:support@singletonsd.com',
-    icon: 'mail',
+    label: "Email Support",
+    value: "support@singletonsd.com",
+    href: "mailto:support@singletonsd.com",
+    icon: "mail",
   },
   {
-    label: 'Main Website',
-    value: 'singletonsd.com',
-    href: 'https://singletonsd.com',
-    icon: 'globe',
+    label: "Main Website",
+    value: "singletonsd.com",
+    href: "https://singletonsd.com",
+    icon: "globe",
   },
   {
-    label: 'GitHub Repository',
-    value: 'github.com/singleton-sd/poc-plattform-kit',
-    href: 'https://github.com/singleton-sd/poc-plattform-kit',
-    icon: 'github',
+    label: "GitHub Repository",
+    value: "github.com/singleton-sd/poc-plattform-kit",
+    href: "https://github.com/singleton-sd/poc-plattform-kit",
+    icon: "github",
   },
 ];
 
-const privacyHref = withBase('/privacy');
-const waitlistHref = withBase('/waitlist');
-const contactAction = withBase('/contact');
-const turnstileSiteKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ?? '';
+const privacyHref = withBase("/privacy");
+const waitlistHref = withBase("/waitlist");
+const contactAction = withBase("/contact");
+const turnstileSiteKey =
+  (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ?? "";
 const intakeUrl =
-  (import.meta.env.PUBLIC_LEAD_INTAKE_URL as string | undefined)?.replace(/\/$/, '') ||
-  LEAD_INTAKE_URL;
+  (import.meta.env.PUBLIC_LEAD_INTAKE_URL as string | undefined)?.replace(
+    /\/$/,
+    "",
+  ) || LEAD_INTAKE_URL;
 ---
 
-<section class:list={['pb-20 pt-4 md:pb-[7.5rem] md:pt-10', className]}>
+<section class:list={["pb-20 pt-4 md:pb-[7.5rem] md:pt-10", className]}>
   <PageContainer>
-    <div class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_23.75rem] lg:gap-16">
+    <div
+      class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_23.75rem] lg:gap-16"
+    >
       <div class="relative">
         <div id="contact-form-panel">
           <form
@@ -87,10 +93,12 @@ const intakeUrl =
           >
             <noscript>
               <Alert variant="error">
-                JavaScript is required to send this form securely. Email{' '}
-                <a href="mailto:support@singletonsd.com" class="font-semibold underline-offset-2 hover:underline"
+                JavaScript is required to send this form securely. Email{" "}
+                <a
+                  href="mailto:support@singletonsd.com"
+                  class="font-semibold underline-offset-2 hover:underline"
                   >support@singletonsd.com</a
-                >{' '}instead.
+                >{" "}instead.
               </Alert>
             </noscript>
             <div id="contact-form-error" class="hidden" role="alert">
@@ -171,25 +179,38 @@ const intakeUrl =
               </div>
               <div class="flex flex-col gap-3">
                 <Checkbox id="contact-consent" name="consent" required>
-                  I agree to the processing of my details as described in the{' '}
-                  <a href={privacyHref} class="font-semibold text-accent underline-offset-2 hover:underline"
+                  I agree to the processing of my details as described in the{
+                    " "
+                  }
+                  <a
+                    href={privacyHref}
+                    class="font-semibold text-accent underline-offset-2 hover:underline"
                     >privacy policy</a
                   >.
                 </Checkbox>
                 <Checkbox id="contact-marketing" name="marketingOptIn">
-                  Send me occasional product updates. Leave this unchecked if you only want a reply.
+                  Send me occasional product updates. Leave this unchecked if
+                  you only want a reply.
                 </Checkbox>
               </div>
-              <div id="contact-turnstile" class="min-h-16" data-lead-field></div>
+              <div id="contact-turnstile" class="min-h-16" data-lead-field>
+              </div>
             </div>
 
             <div class="flex flex-col gap-3">
-              <Button type="submit" size="lg" class="w-full sm:w-[12.5rem]" disabled>
+              <Button
+                type="submit"
+                size="lg"
+                class="w-full sm:w-[12.5rem]"
+                disabled
+              >
                 Send message
               </Button>
               <p class="m-0 text-caption text-fg-muted">
-                We typically respond within 24 hours. Prefer early access?{' '}
-                <a href={waitlistHref} class="font-semibold text-accent hover:underline"
+                We typically respond within 24 hours. Prefer early access?{" "}
+                <a
+                  href={waitlistHref}
+                  class="font-semibold text-accent hover:underline"
                   >Join the waitlist</a
                 >.
               </p>
@@ -199,19 +220,27 @@ const intakeUrl =
 
         <div id="contact-success" class="hidden space-y-4" role="status">
           <Alert variant="success">
-            Thanks — your message was sent. We typically respond within 24 hours.
+            Thanks — your message was sent. We typically respond within 24
+            hours.
           </Alert>
           <div id="contact-reset">
-            <Button type="button" variant="outline" size="lg"> Send another message </Button>
+            <Button type="button" variant="outline" size="lg">
+              Send another message
+            </Button>
           </div>
         </div>
       </div>
 
-      <aside class="flex flex-col gap-8 rounded-xl border border-border bg-bg-muted p-6 md:p-10">
+      <aside
+        class="flex flex-col gap-8 rounded-xl border border-border bg-bg-muted p-6 md:p-10"
+      >
         <div class="space-y-2">
-          <h2 class="m-0 font-heading text-h3 text-fg">Other ways to reach us</h2>
+          <h2 class="m-0 font-heading text-h3 text-fg">
+            Other ways to reach us
+          </h2>
           <p class="m-0 text-body-sm leading-relaxed text-fg-muted">
-            Need specialized assistance? You can directly contact our teams or browse open code.
+            Need specialized assistance? You can directly contact our teams or
+            browse open code.
           </p>
         </div>
         <hr class="m-0 border-0 border-t border-border" />
@@ -219,7 +248,10 @@ const intakeUrl =
           {
             reachItems.map((item) => (
               <li class="flex items-center gap-3">
-                <span class="inline-flex size-5 shrink-0 text-accent" aria-hidden="true">
+                <span
+                  class="inline-flex size-5 shrink-0 text-accent"
+                  aria-hidden="true"
+                >
                   <Icon name={item.icon} size={20} />
                 </span>
                 <div class="min-w-0">
@@ -229,8 +261,12 @@ const intakeUrl =
                   <a
                     href={item.href}
                     class="text-body-sm font-semibold text-fg transition hover:text-accent"
-                    rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    target={item.href.startsWith('http') ? '_blank' : undefined}
+                    rel={
+                      item.href.startsWith("http")
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+                    target={item.href.startsWith("http") ? "_blank" : undefined}
                   >
                     {item.value}
                   </a>
@@ -245,14 +281,14 @@ const intakeUrl =
 </section>
 
 <script>
-  import { bindLeadForm } from '../../lib/leads/bind-lead-form.mjs';
+  import { bindLeadForm } from "../../lib/leads/bind-lead-form.mjs";
 
-  const form = document.getElementById('contact-form');
+  const form = document.getElementById("contact-form");
   if (form instanceof HTMLFormElement) {
     bindLeadForm({
       form,
-      formType: 'contact',
-      siteKey: form.dataset.turnstileSiteKey ?? '',
+      formType: "contact",
+      siteKey: form.dataset.turnstileSiteKey ?? "",
       intakeUrl: form.dataset.intakeUrl,
     });
   }

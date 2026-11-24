@@ -1,4 +1,4 @@
-import { isAbsoluteUrl, normalizeBase, withBase } from './with-base.mjs';
+import { isAbsoluteUrl, normalizeBase, withBase } from "./with-base.mjs";
 
 /**
  * Prefix site-relative href/src on Markdown HTML so CMS copy like
@@ -7,15 +7,19 @@ import { isAbsoluteUrl, normalizeBase, withBase } from './with-base.mjs';
  * @param {{ base?: string }} [options]
  */
 export function rehypePrefixBase(options = {}) {
-  const base = normalizeBase(options.base ?? '/');
+  const base = normalizeBase(options.base ?? "/");
 
   /**
    * @param {unknown} value
    * @returns {unknown}
    */
   function rewrite(value) {
-    if (typeof value !== 'string' || value.length === 0) return value;
-    if (isAbsoluteUrl(value) || value.startsWith('#') || !value.startsWith('/')) {
+    if (typeof value !== "string" || value.length === 0) return value;
+    if (
+      isAbsoluteUrl(value) ||
+      value.startsWith("#") ||
+      !value.startsWith("/")
+    ) {
       return value;
     }
     return withBase(value, base);
@@ -25,16 +29,16 @@ export function rehypePrefixBase(options = {}) {
    * @param {unknown} node
    */
   function walk(node) {
-    if (!node || typeof node !== 'object') return;
+    if (!node || typeof node !== "object") return;
     const element =
       /** @type {{ type?: string, tagName?: string, properties?: Record<string, unknown>, children?: unknown[] }} */ (
         node
       );
-    if (element.type === 'element' && element.properties) {
-      if ('href' in element.properties) {
+    if (element.type === "element" && element.properties) {
+      if ("href" in element.properties) {
         element.properties.href = rewrite(element.properties.href);
       }
-      if ('src' in element.properties) {
+      if ("src" in element.properties) {
         element.properties.src = rewrite(element.properties.src);
       }
     }

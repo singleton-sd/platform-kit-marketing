@@ -3,7 +3,7 @@ interface Props {
   id: string;
   name?: string;
   label: string;
-  type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number';
+  type?: "text" | "email" | "password" | "tel" | "url" | "search" | "number";
   placeholder?: string;
   helper?: string;
   error?: string;
@@ -19,7 +19,7 @@ const {
   id,
   name = id,
   label,
-  type = 'text',
+  type = "text",
   placeholder,
   helper,
   error,
@@ -28,23 +28,27 @@ const {
   required = false,
   maxLength,
   autocomplete,
-  class: className = '',
+  class: className = "",
 } = Astro.props;
 
 const countId = maxLength ? `${id}-count` : undefined;
 const describedBy =
-  [error ? `${id}-error` : null, !error && helper ? `${id}-helper` : null, countId]
+  [
+    error ? `${id}-error` : null,
+    !error && helper ? `${id}-helper` : null,
+    countId,
+  ]
     .filter(Boolean)
-    .join(' ') || undefined;
+    .join(" ") || undefined;
 ---
 
-<div class:list={['flex w-full flex-col gap-2', className]} data-lead-field>
+<div class:list={["flex w-full flex-col gap-2", className]} data-lead-field>
   <label for={id} class="text-body-sm font-semibold text-fg">
     {label}
     {
       required ? (
         <span class="text-accent" aria-hidden="true">
-          {' '}
+          {" "}
           *
         </span>
       ) : null
@@ -52,10 +56,10 @@ const describedBy =
   </label>
   <div
     class:list={[
-      'flex items-center gap-2 rounded-md border bg-bg px-3 py-3 text-body-sm transition',
+      "flex items-center gap-2 rounded-md border bg-bg px-3 py-3 text-body-sm transition",
       error
-        ? 'border-status-error'
-        : 'border-border focus-within:border-2 focus-within:border-accent focus-within:px-[11px] focus-within:py-[11px]',
+        ? "border-status-error"
+        : "border-border focus-within:border-2 focus-within:border-accent focus-within:px-[11px] focus-within:py-[11px]",
     ]}
   >
     <input
@@ -68,7 +72,7 @@ const describedBy =
       aria-required={required || undefined}
       maxlength={maxLength}
       autocomplete={autocomplete}
-      aria-invalid={error ? 'true' : undefined}
+      aria-invalid={error ? "true" : undefined}
       aria-describedby={describedBy}
       class="min-w-0 flex-1 border-0 bg-transparent p-0 text-fg outline-none placeholder:text-fg-subtle"
     />
@@ -88,7 +92,7 @@ const describedBy =
   {
     maxLength ? (
       <p id={countId} class="m-0 text-caption text-fg-muted">
-        {(value ?? '').length}/{maxLength}
+        {(value ?? "").length}/{maxLength}
       </p>
     ) : null
   }

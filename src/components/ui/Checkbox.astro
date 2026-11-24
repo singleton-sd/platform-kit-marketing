@@ -14,14 +14,17 @@ const {
   name = id,
   label,
   checked = false,
-  value = 'on',
+  value = "on",
   required = false,
-  class: className = '',
+  class: className = "",
 } = Astro.props;
 ---
 
 <label
-  class:list={['inline-flex cursor-pointer items-start gap-3 text-body-sm text-fg', className]}
+  class:list={[
+    "inline-flex cursor-pointer items-start gap-3 text-body-sm text-fg",
+    className,
+  ]}
   data-lead-field
 >
   <input
@@ -39,7 +42,7 @@ const {
     {
       required ? (
         <span class="text-accent" aria-hidden="true">
-          {' '}
+          {" "}
           *
         </span>
       ) : null

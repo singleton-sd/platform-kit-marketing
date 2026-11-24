@@ -1,5 +1,9 @@
-import { LEAD_BODY_MAX_BYTES, LEAD_INTAKE_URL, utf8ByteLength } from './lead-config.mjs';
-import { isLeadBodyWithinLimit } from './build-lead-payload.mjs';
+import {
+  LEAD_BODY_MAX_BYTES,
+  LEAD_INTAKE_URL,
+  utf8ByteLength,
+} from "./lead-config.mjs";
+import { isLeadBodyWithinLimit } from "./build-lead-payload.mjs";
 
 /**
  * @typedef {'success' | 'validation' | 'unavailable' | 'retry'} LeadSubmitKind
@@ -12,20 +16,26 @@ import { isLeadBodyWithinLimit } from './build-lead-payload.mjs';
  * @property {boolean} [resetTurnstile]
  */
 
-export const VALIDATION_MESSAGE = 'Please fix the highlighted fields and try again.';
+export const VALIDATION_MESSAGE =
+  "Please fix the highlighted fields and try again.";
 export const UNAVAILABLE_MESSAGE =
-  'Lead intake is temporarily unavailable. Please try again later.';
-export const RETRY_MESSAGE = 'Something went wrong. Please try again.';
+  "Lead intake is temporarily unavailable. Please try again later.";
+export const RETRY_MESSAGE = "Something went wrong. Please try again.";
 export const NETWORK_MESSAGE =
-  'We could not reach the server. Check your connection and try again.';
-export const TOKEN_REQUIRED_MESSAGE = 'Complete the security check.';
-export const TOKEN_EXPIRED_MESSAGE = 'The security check expired. Complete it again.';
-export const TOKEN_ERROR_MESSAGE = 'The security check failed. Please try again.';
+  "We could not reach the server. Check your connection and try again.";
+export const TOKEN_REQUIRED_MESSAGE = "Complete the security check.";
+export const TOKEN_EXPIRED_MESSAGE =
+  "The security check expired. Complete it again.";
+export const TOKEN_ERROR_MESSAGE =
+  "The security check failed. Please try again.";
 export const TURNSTILE_FAILED_MESSAGE =
-  'The security check could not be verified. Complete it again and retry.';
-export const RATE_LIMIT_MESSAGE = 'Too many requests. Please wait and try again.';
-export const SERVICE_UNAVAILABLE_MESSAGE = 'Temporarily unavailable. Please try again later.';
-export const BODY_TOO_LARGE_MESSAGE = 'Your message is too long. Shorten it and try again.';
+  "The security check could not be verified. Complete it again and retry.";
+export const RATE_LIMIT_MESSAGE =
+  "Too many requests. Please wait and try again.";
+export const SERVICE_UNAVAILABLE_MESSAGE =
+  "Temporarily unavailable. Please try again later.";
+export const BODY_TOO_LARGE_MESSAGE =
+  "Your message is too long. Shorten it and try again.";
 export const LEAD_SUBMIT_TIMEOUT_MS = 15_000;
 
 /**
@@ -33,8 +43,8 @@ export const LEAD_SUBMIT_TIMEOUT_MS = 15_000;
  * @returns {number | null}
  */
 export function readRetryAfterSeconds(headers) {
-  const raw = headers?.get?.('Retry-After') ?? headers?.get?.('retry-after');
-  if (typeof raw !== 'string' || !raw.trim()) return null;
+  const raw = headers?.get?.("Retry-After") ?? headers?.get?.("retry-after");
+  if (typeof raw !== "string" || !raw.trim()) return null;
   const delta = Number(raw);
   if (Number.isFinite(delta) && delta >= 0) return Math.ceil(delta);
   const date = Date.parse(raw);
@@ -48,10 +58,10 @@ export function readRetryAfterSeconds(headers) {
  */
 function formatWait(seconds) {
   if (seconds < 60) {
-    return `${seconds} second${seconds === 1 ? '' : 's'}`;
+    return `${seconds} second${seconds === 1 ? "" : "s"}`;
   }
   const minutes = Math.ceil(seconds / 60);
-  return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
 }
 
 /**
@@ -77,7 +87,7 @@ export function unavailableRetryAfterMessage(seconds) {
  * @returns {Record<string, unknown> | null}
  */
 function asRecord(value) {
-  return value && typeof value === 'object' && !Array.isArray(value)
+  return value && typeof value === "object" && !Array.isArray(value)
     ? /** @type {Record<string, unknown>} */ (value)
     : null;
 }
@@ -90,7 +100,9 @@ export function readFieldPaths(value) {
   const record = asRecord(value);
   if (!record) return [];
   if (Array.isArray(record.details)) {
-    return record.details.filter((item) => typeof item === 'string' && item.length > 0);
+    return record.details.filter(
+      (item) => typeof item === "string" && item.length > 0,
+    );
   }
   return [];
 }
@@ -101,10 +113,10 @@ export function readFieldPaths(value) {
  */
 export function readErrorCode(value) {
   const record = asRecord(value);
-  if (!record) return '';
-  if (typeof record.error === 'string') return record.error;
-  if (typeof record.code === 'string') return record.code;
-  return '';
+  if (!record) return "";
+  if (typeof record.error === "string") return record.error;
+  if (typeof record.code === "string") return record.code;
+  return "";
 }
 
 /**
@@ -122,13 +134,13 @@ export function mapLeadResponse(status, body, headers) {
   const fields = readFieldPaths(body);
 
   if (status === 202) {
-    return { ok: true, kind: 'success', message: '' };
+    return { ok: true, kind: "success", message: "" };
   }
 
-  if (status === 404 || code === 'function_disabled') {
+  if (status === 404 || code === "function_disabled") {
     return {
       ok: false,
-      kind: 'unavailable',
+      kind: "unavailable",
       message: UNAVAILABLE_MESSAGE,
       resetTurnstile: true,
     };
@@ -137,17 +149,17 @@ export function mapLeadResponse(status, body, headers) {
   if (status === 400) {
     return {
       ok: false,
-      kind: 'validation',
+      kind: "validation",
       message: VALIDATION_MESSAGE,
       fields,
       resetTurnstile: true,
     };
   }
 
-  if (code === 'turnstile_failed') {
+  if (code === "turnstile_failed") {
     return {
       ok: false,
-      kind: 'retry',
+      kind: "retry",
       message: TURNSTILE_FAILED_MESSAGE,
       resetTurnstile: true,
     };
@@ -156,7 +168,7 @@ export function mapLeadResponse(status, body, headers) {
   if (status === 429) {
     return {
       ok: false,
-      kind: 'retry',
+      kind: "retry",
       message: retryAfterMessage(readRetryAfterSeconds(headers)),
       resetTurnstile: true,
     };
@@ -165,7 +177,7 @@ export function mapLeadResponse(status, body, headers) {
   if (status === 503) {
     return {
       ok: false,
-      kind: 'retry',
+      kind: "retry",
       message: unavailableRetryAfterMessage(readRetryAfterSeconds(headers)),
       resetTurnstile: true,
     };
@@ -174,25 +186,28 @@ export function mapLeadResponse(status, body, headers) {
   if (status === 403 || status >= 500) {
     return {
       ok: false,
-      kind: 'retry',
+      kind: "retry",
       message: RETRY_MESSAGE,
       resetTurnstile: true,
     };
   }
 
-  if (status === 413 || utf8ByteLength(JSON.stringify(body ?? '')) > LEAD_BODY_MAX_BYTES) {
+  if (
+    status === 413 ||
+    utf8ByteLength(JSON.stringify(body ?? "")) > LEAD_BODY_MAX_BYTES
+  ) {
     return {
       ok: false,
-      kind: 'validation',
+      kind: "validation",
       message: BODY_TOO_LARGE_MESSAGE,
-      fields: ['message'],
+      fields: ["message"],
       resetTurnstile: true,
     };
   }
 
   return {
     ok: false,
-    kind: 'retry',
+    kind: "retry",
     message: RETRY_MESSAGE,
     resetTurnstile: true,
   };
@@ -216,32 +231,37 @@ export async function submitLead(payload, options = {}) {
   if (!isLeadBodyWithinLimit(body)) {
     return {
       ok: false,
-      kind: 'validation',
+      kind: "validation",
       message: BODY_TOO_LARGE_MESSAGE,
-      fields: ['message'],
+      fields: ["message"],
       resetTurnstile: false,
     };
   }
 
-  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  const controller =
+    typeof AbortController === "function" ? new AbortController() : null;
   /** @type {ReturnType<typeof setTimeout> | undefined} */
   let timer;
   const timeoutPromise = new Promise((_, reject) => {
     timer = setTimeout(() => {
       controller?.abort();
-      reject(Object.assign(new Error('lead intake timed out'), { name: 'AbortError' }));
+      reject(
+        Object.assign(new Error("lead intake timed out"), {
+          name: "AbortError",
+        }),
+      );
     }, timeoutMs);
   });
   timeoutPromise.catch(() => undefined);
 
   const fetchPromise = (async () => {
     const response = await fetchImpl(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-      credentials: 'omit',
+      credentials: "omit",
       signal: controller?.signal,
       body,
     });
@@ -260,7 +280,7 @@ export async function submitLead(payload, options = {}) {
   } catch {
     return {
       ok: false,
-      kind: 'retry',
+      kind: "retry",
       message: NETWORK_MESSAGE,
       resetTurnstile: true,
     };

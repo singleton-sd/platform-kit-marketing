@@ -191,7 +191,9 @@ async function mockLeads(handler) {
 async function fillContact(target, extras = {}) {
   await target.locator("#contact-name").fill("Ada Lovelace");
   await target.locator("#contact-email").fill("ada@example.com");
-  await target.locator("#contact-subject").selectOption(extras.subject ?? "sales");
+  await target
+    .locator("#contact-subject")
+    .selectOption(extras.subject ?? "sales");
   await target
     .locator("#contact-message")
     .fill(extras.message ?? "Please get in touch about a demo.");
@@ -207,7 +209,8 @@ try {
   await page.goto(`${origin}/contact/`, { waitUntil: "networkidle" });
   await fillContact(page);
   await page.waitForFunction(
-    () => !document.querySelector("#contact-form button[type=submit]")?.disabled,
+    () =>
+      !document.querySelector("#contact-form button[type=submit]")?.disabled,
   );
   await page.locator("#contact-form button[type=submit]").click();
   await page.waitForSelector("#contact-success:not(.hidden)");
@@ -242,7 +245,8 @@ try {
   await page.locator("#waitlist-feature").selectOption("early_access");
   await page.locator("#waitlist-consent").check();
   await page.waitForFunction(
-    () => !document.querySelector("#waitlist-form button[type=submit]")?.disabled,
+    () =>
+      !document.querySelector("#waitlist-form button[type=submit]")?.disabled,
   );
   await page.locator("#waitlist-form button[type=submit]").click();
   await page.waitForSelector("#waitlist-success:not(.hidden)");
@@ -282,7 +286,8 @@ try {
   await page.goto(`${origin}/contact/`, { waitUntil: "networkidle" });
   await fillContact(page, { subject: "general" });
   await page.waitForFunction(
-    () => !document.querySelector("#contact-form button[type=submit]")?.disabled,
+    () =>
+      !document.querySelector("#contact-form button[type=submit]")?.disabled,
   );
   await page.locator("#contact-form button[type=submit]").click();
   await page.waitForSelector("#contact-form-error:not(.hidden)");
@@ -295,7 +300,8 @@ try {
     "Enter a valid email address.",
   );
   await page.waitForFunction(
-    () => !document.querySelector("#contact-form button[type=submit]")?.disabled,
+    () =>
+      !document.querySelector("#contact-form button[type=submit]")?.disabled,
   );
   await page.locator("#contact-form button[type=submit]").click();
   await page.waitForSelector("#contact-form-error:not(.hidden)");
@@ -317,7 +323,8 @@ try {
   await page.goto(`${origin}/contact/`, { waitUntil: "networkidle" });
   await fillContact(page, { subject: "general" });
   await page.waitForFunction(
-    () => !document.querySelector("#contact-form button[type=submit]")?.disabled,
+    () =>
+      !document.querySelector("#contact-form button[type=submit]")?.disabled,
   );
   await page.locator("#contact-form button[type=submit]").click();
   const formError = page.locator("#contact-form-error");
@@ -326,7 +333,12 @@ try {
     await formError.innerText(),
     /Lead intake is temporarily unavailable/,
   );
-  assert.equal(await page.locator("#contact-success").evaluate((el) => el.classList.contains("hidden")), true);
+  assert.equal(
+    await page
+      .locator("#contact-success")
+      .evaluate((el) => el.classList.contains("hidden")),
+    true,
+  );
   await page
     .locator("#contact-message")
     .fill("Please get in touch about a demo. Updated.");
@@ -334,12 +346,17 @@ try {
     await formError.innerText(),
     /Lead intake is temporarily unavailable/,
   );
-  assert.equal(await formError.evaluate((el) => el.classList.contains("hidden")), false);
+  assert.equal(
+    await formError.evaluate((el) => el.classList.contains("hidden")),
+    false,
+  );
 
   const noJsContext = await browser.newContext({ javaScriptEnabled: false });
   const noJsPage = await noJsContext.newPage();
   try {
-    await noJsPage.goto(`${origin}/contact/`, { waitUntil: "domcontentloaded" });
+    await noJsPage.goto(`${origin}/contact/`, {
+      waitUntil: "domcontentloaded",
+    });
     assert.match(
       await noJsPage.locator("#contact-form").getAttribute("method"),
       /post/i,
@@ -352,7 +369,9 @@ try {
     assert.match(contactHtml, /<noscript>/i);
     assert.match(contactHtml, /support@singletonsd.com/);
 
-    await noJsPage.goto(`${origin}/waitlist/`, { waitUntil: "domcontentloaded" });
+    await noJsPage.goto(`${origin}/waitlist/`, {
+      waitUntil: "domcontentloaded",
+    });
     assert.match(
       await noJsPage.locator("#waitlist-form").getAttribute("method"),
       /post/i,

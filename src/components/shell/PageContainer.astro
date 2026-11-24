@@ -1,9 +1,9 @@
 ---
-type ContainerTag = 'div' | 'section' | 'main' | 'article';
+type ContainerTag = "div" | "section" | "main" | "article";
 
 const {
-  class: className = '',
-  as: Tag = 'div',
+  class: className = "",
+  as: Tag = "div",
   narrow = false,
 } = Astro.props as {
   class?: string;
@@ -14,8 +14,8 @@ const {
 
 <Tag
   class:list={[
-    'mx-auto w-full px-5 md:px-10',
-    narrow ? 'max-w-2xl' : 'max-w-content',
+    "mx-auto w-full px-5 md:px-10",
+    narrow ? "max-w-2xl" : "max-w-content",
     className,
   ]}
 >
