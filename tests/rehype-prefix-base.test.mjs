@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { rehypePrefixBase } from './rehype-prefix-base.mjs';
+import { rehypePrefixBase } from '../src/lib/rehype-prefix-base.mjs';
 
 test('rehypePrefixBase prefixes markdown /privacy under a preview base', () => {
   const tree = {

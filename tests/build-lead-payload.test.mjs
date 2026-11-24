@@ -6,7 +6,7 @@ import {
   normaliseEmail,
   serializeLeadPayload,
   validateLeadValues,
-} from './build-lead-payload.mjs';
+} from '../src/lib/leads/build-lead-payload.mjs';
 import {
   LEAD_BODY_MAX_BYTES,
   LEAD_CONSENT_TEXT_VERSION,
@@ -15,7 +15,7 @@ import {
   createSubmissionId,
   isUuidV4,
   utf8ByteLength,
-} from './lead-config.mjs';
+} from '../src/lib/leads/lead-config.mjs';
 
 const SUBMISSION_ID = '550e8400-e29b-41d4-a716-446655440000';
 

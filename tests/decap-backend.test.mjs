@@ -4,9 +4,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-const marketingRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const repoRoot = join(marketingRoot, '../..');
-const configPath = join(marketingRoot, 'public/admin/config.yml');
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
+const configPath = join(repoRoot, 'public/admin/config.yml');
 
 const retiredAuthHost = ['auth', 'singletonsd.com'].join('.');
 const retiredOauthKit = ['cms', 'oauth', 'kit'].join('-');
@@ -16,6 +15,8 @@ const skipDirNames = new Set([
   'node_modules',
   'dist',
   '.astro',
+  'test-results',
+  'visual-base',
   'coverage',
   '.agents',
   '.claude',

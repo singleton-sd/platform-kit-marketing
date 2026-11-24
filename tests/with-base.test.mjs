@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { isAbsoluteUrl, normalizeBase, stripBase, withBase } from './with-base.mjs';
+import { isAbsoluteUrl, normalizeBase, stripBase, withBase } from '../src/lib/with-base.mjs';
 
 test('normalizeBase always has a trailing slash', () => {
   assert.equal(normalizeBase('/'), '/');

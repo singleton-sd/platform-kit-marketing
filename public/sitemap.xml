@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Generated during pnpm build — see scripts/generate-sitemap.mjs -->
+  <url>
+    <loc>https://plattform-kit.poc.singletonsd.com/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>

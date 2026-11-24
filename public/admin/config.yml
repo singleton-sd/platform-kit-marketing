@@ -28,7 +28,7 @@ collections:
     folder: apps/marketing/src/content/pages
     create: true
     delete: false
-    slug: '{{slug}}'
+    slug: "{{slug}}"
     extension: md
     format: frontmatter
     # Flat fields stay compatible with Astro content schema (no nested objects).

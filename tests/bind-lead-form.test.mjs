@@ -4,8 +4,8 @@ import {
   foldSubjectIntoMessage,
   serverFieldsToErrors,
   shouldHideValidationSummary,
-} from './bind-lead-form.mjs';
-import { LEAD_MESSAGE_MAX } from './lead-config.mjs';
+} from '../src/lib/leads/bind-lead-form.mjs';
+import { LEAD_MESSAGE_MAX } from '../src/lib/leads/lead-config.mjs';
 
 test('server field paths map onto brochure copy', () => {
   const errors = serverFieldsToErrors(['email', 'consent', 'turnstileToken', 'unknown']);

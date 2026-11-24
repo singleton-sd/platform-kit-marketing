@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildLeadPayload } from './build-lead-payload.mjs';
-import { LEAD_INTAKE_URL } from './lead-config.mjs';
+import { buildLeadPayload } from '../src/lib/leads/build-lead-payload.mjs';
+import { LEAD_INTAKE_URL } from '../src/lib/leads/lead-config.mjs';
 import {
   NETWORK_MESSAGE,
   RATE_LIMIT_MESSAGE,
@@ -17,7 +17,7 @@ import {
   retryAfterMessage,
   submitLead,
   unavailableRetryAfterMessage,
-} from './submit-lead.mjs';
+} from '../src/lib/leads/submit-lead.mjs';
 
 const payload = buildLeadPayload({
   formType: 'contact',

@@ -7,7 +7,7 @@ import {
   checkBuiltAssetPaths,
   checkPrefixedPath,
   findAssetPathErrors,
-} from './check-asset-paths.mjs';
+} from '../scripts/check-asset-paths.mjs';
 
 test('checkPrefixedPath accepts root-relative production URLs', () => {
   assert.equal(checkPrefixedPath('/_astro/page.js', '/'), null);

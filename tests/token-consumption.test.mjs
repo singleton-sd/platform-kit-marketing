@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { copyMarketingTokenCss } from './copy-token-css.mjs';
+import { copyMarketingTokenCss } from '../scripts/copy-token-css.mjs';
 
 const marketingRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const sourceExtensions = new Set(['.astro', '.css', '.html', '.js', '.mjs', '.cjs', '.ts']);
@@ -27,7 +27,7 @@ function collectSourceFiles(dir) {
 }
 
 test('GitLab npm registry is configured for the @singleton-sd scope', () => {
-  const npmrc = readFileSync(join(marketingRoot, '../../.npmrc'), 'utf8');
+  const npmrc = readFileSync(join(marketingRoot, '.npmrc'), 'utf8');
   assert.match(npmrc, /@singleton-sd:registry=https:\/\/gitlab\.com\/api\/v4\/packages\/npm\//);
 });
 
@@ -35,7 +35,7 @@ test('marketing depends on the published @singleton-sd/tokens package', () => {
   const pkg = JSON.parse(readFileSync(join(marketingRoot, 'package.json'), 'utf8'));
   assert.ok(
     pkg.dependencies?.['@singleton-sd/tokens'],
-    'apps/marketing/package.json must depend on @singleton-sd/tokens',
+    'package.json must depend on @singleton-sd/tokens',
   );
 });
 

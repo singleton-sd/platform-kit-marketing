@@ -4,7 +4,11 @@ import Button from '../components/ui/Button.astro';
 import PageContainer from '../components/shell/PageContainer.astro';
 ---
 
-<BaseLayout title="Page not found — Platform Kit" description="This page does not exist.">
+<BaseLayout
+  title="Page not found — Platform Kit"
+  description="This page does not exist."
+  robots="noindex,follow"
+>
   <PageContainer narrow class="pb-12 pt-[clamp(3rem,12vh,6rem)] text-center">
     <p class="mb-3 font-heading text-body-sm font-semibold uppercase tracking-widest text-accent">
       404
