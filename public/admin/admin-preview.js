@@ -4,8 +4,8 @@
  * https://decapcms.org/docs/customization/
  *
  * Mirrors live templates:
- * - home → apps/marketing/src/pages/index.astro
- * - other slugs → apps/marketing/src/pages/[slug].astro
+ * - home → src/pages/index.astro
+ * - other slugs → src/pages/[slug].astro
  * description is SEO-only (BaseLayout meta), never page body.
  */
 (function registerAdminPreview() {

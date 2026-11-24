@@ -10,3 +10,4 @@ src/content/pages/terms.md
 .env.*
 .cursor
 *.mdc
+public/admin/tokens

@@ -25,3 +25,6 @@ pnpm-debug.log*
 # local / CI test outputs
 test-results/
 playwright-report/
+
+# Copied from @singleton-sd/tokens when Astro loads (static Decap admin).
+public/admin/tokens/
