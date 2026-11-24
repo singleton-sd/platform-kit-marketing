@@ -260,7 +260,7 @@ async function screenshotPage(
   const page = await context.newPage();
   try {
     const response = await page.goto(url, {
-      waitUntil: "networkidle",
+      waitUntil: "load",
       timeout: 45_000,
     });
     const status = response?.status() ?? 0;

@@ -206,7 +206,7 @@ try {
     json: { id: body.submissionId },
   }));
 
-  await page.goto(`${origin}/contact/`, { waitUntil: "networkidle" });
+  await page.goto(`${origin}/contact/`, { waitUntil: "load" });
   await fillContact(page);
   await page.waitForFunction(
     () =>
@@ -239,7 +239,7 @@ try {
     status: 202,
     json: { id: body.submissionId },
   }));
-  await page.goto(`${origin}/waitlist/`, { waitUntil: "networkidle" });
+  await page.goto(`${origin}/waitlist/`, { waitUntil: "load" });
   await page.locator("#waitlist-name").fill("Ada Lovelace");
   await page.locator("#waitlist-email").fill("ada@example.com");
   await page.locator("#waitlist-feature").selectOption("early_access");
@@ -283,7 +283,7 @@ try {
       },
     };
   });
-  await page.goto(`${origin}/contact/`, { waitUntil: "networkidle" });
+  await page.goto(`${origin}/contact/`, { waitUntil: "load" });
   await fillContact(page, { subject: "general" });
   await page.waitForFunction(
     () =>
@@ -320,7 +320,7 @@ try {
       message: "function lead-intake is disabled",
     },
   }));
-  await page.goto(`${origin}/contact/`, { waitUntil: "networkidle" });
+  await page.goto(`${origin}/contact/`, { waitUntil: "load" });
   await fillContact(page, { subject: "general" });
   await page.waitForFunction(
     () =>

@@ -121,8 +121,7 @@ const page = await context.newPage();
 
 try {
   for (const route of ROUTES) {
-    await page.goto(`${baseUrl}${route}`, { waitUntil: "domcontentloaded" });
-    await page.waitForLoadState("networkidle");
+    await page.goto(`${baseUrl}${route}`, { waitUntil: "load" });
 
     // Token 1.3.0 muted/accent colours fail WCAG AA; restyling is out of scope.
     const axeResults = await new AxeBuilder({ page })
@@ -146,8 +145,7 @@ try {
     }
   }
 
-  await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
-  await page.waitForLoadState("networkidle");
+  await page.goto(`${baseUrl}/`, { waitUntil: "load" });
 
   const interactiveHrefs = await page.evaluate(() => {
     const selector =
