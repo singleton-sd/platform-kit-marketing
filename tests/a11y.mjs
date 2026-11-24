@@ -117,8 +117,8 @@ const browser = await chromium.launch();
 const context = await browser.newContext({
   viewport: { width: 1280, height: 720 },
 });
-// Forms always load Turnstile; abort off-origin requests so networkidle is
-// reachable in CI (Cloudflare never settles on the static test server).
+// Forms always load Turnstile; stub it and abort off-origin requests so CI
+// does not wait on Cloudflare.
 await context.addInitScript(() => {
   window.turnstile = {
     render(container, options) {
