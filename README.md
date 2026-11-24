@@ -1,7 +1,7 @@
 # platform-kit-marketing
 
 Public marketing site for Platform Kit, served at
-[https://platform-kit.singletonsd.com](https://platform-kit.singletonsd.com).
+[https://plattform-kit.poc.singletonsd.com](https://plattform-kit.poc.singletonsd.com).
 
 The site moved here from [`poc-plattform-kit`](https://github.com/singleton-sd/poc-plattform-kit)
 `apps/marketing`, with git history rewritten so the app sits at this repo root.

@@ -66,7 +66,7 @@ const baseDistDir = process.env.VISUAL_BASE_DIR
 const baseSha = (process.env.VISUAL_BASE_SHA ?? "").trim() || null;
 const headSha = (process.env.VISUAL_HEAD_SHA ?? "").trim() || null;
 const baseSiteUrl = (
-  process.env.VISUAL_BASE_URL ?? "https://platform-kit.singletonsd.com"
+  process.env.VISUAL_BASE_URL ?? "https://plattform-kit.poc.singletonsd.com"
 ).replace(/\/$/, "");
 const baseLabel = baseDistDir ? `local:${baseDistDir}` : baseSiteUrl;
 
