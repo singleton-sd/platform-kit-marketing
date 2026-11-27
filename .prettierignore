@@ -1,0 +1,13 @@
+.astro
+dist
+node_modules
+pnpm-lock.yaml
+pnpm-workspace.yaml
+public/admin/index.html
+src/content/pages/privacy.md
+src/content/pages/terms.md
+.env
+.env.*
+.cursor
+*.mdc
+public/admin/tokens

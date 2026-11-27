@@ -1,0 +1,714 @@
+/* eslint-disable no-undef */
+/**
+ * Full-page visual screenshots for PR review, with base comparison.
+ *
+ * Serves the PR `dist/` build, screenshots every HTML route at desktop + mobile,
+ * then screenshots the same paths from a baseline and writes pixel diffs.
+ *
+ * Baseline (preferred for CI): `VISUAL_BASE_DIR` — a locally built `dist/` of the
+ * PR base SHA (same Astro base path as the PR visual build). This avoids false
+ * diffs when live production is stale or behind main.
+ *
+ * Fallback: `VISUAL_BASE_URL` (default production) when no local baseline dir.
+ *
+ * Output under `test-results/visual/`:
+ * - `pr/<route>-<viewport>.png` — this PR
+ * - `base/<route>-<viewport>.png` — baseline (when the route exists)
+ * - `diff/<route>-<viewport>.png` — red pixel diff (when both exist and differ)
+ * - `index.html` — side-by-side review page (routes grouped; unchanged collapsed)
+ * - `manifest.json` — includes `summary` for CI gating
+ *
+ * Extra interaction shots (hover, focus, open mobile nav, contact and waitlist
+ * form states) are captured from this harness only. The lead-intake-on dist is
+ * built here with PUBLIC_LEAD_INTAKE_ENABLED=true and is never used for the
+ * shipped preview/production config.
+ *
+ * Capture always exits 0 on successful screenshots. Use `pnpm test:visual:gate`
+ * (or CI job `visual-review`) to fail when routes are `changed` or `new`.
+ *
+ * Env:
+ * - VISUAL_BASE_PATH — Astro base used for the PR (and baseline) build
+ * - VISUAL_BASE_DIR — local baseline `dist/` directory (preferred over URL)
+ * - VISUAL_BASE_SHA — git SHA of the baseline build (recorded in manifest)
+ * - VISUAL_HEAD_SHA — git SHA of the PR head (recorded in manifest)
+ * - VISUAL_BASE_URL — remote “before” site if VISUAL_BASE_DIR is unset
+ * - VISUAL_PORT — fixed local port for the PR server (default: ephemeral)
+ * - VISUAL_SKIP_BASE — set to `1` to only capture the PR build
+ */
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import http from "node:http";
+import {
+  createReadStream,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
+import { readFile, rm, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { PNG } from "pngjs";
+import pixelmatch from "pixelmatch";
+import { chromium } from "playwright";
+import { buildReportHtml } from "./visual-report-html.mjs";
+
+const rootDir = fileURLToPath(new URL("..", import.meta.url));
+const distDir = path.join(rootDir, "dist");
+const outDir = path.join(rootDir, "test-results", "visual");
+const port = Number(process.env.VISUAL_PORT ?? 0);
+const basePath = normalizeBase(process.env.VISUAL_BASE_PATH ?? "/");
+const skipBase = process.env.VISUAL_SKIP_BASE === "1";
+const baseDistDir = process.env.VISUAL_BASE_DIR
+  ? path.resolve(process.env.VISUAL_BASE_DIR)
+  : null;
+const baseSha = (process.env.VISUAL_BASE_SHA ?? "").trim() || null;
+const headSha = (process.env.VISUAL_HEAD_SHA ?? "").trim() || null;
+const baseSiteUrl = (
+  process.env.VISUAL_BASE_URL ?? "https://platform-kit.singletonsd.com"
+).replace(/\/$/, "");
+const baseLabel = baseDistDir ? `local:${baseDistDir}` : baseSiteUrl;
+
+if (!existsSync(distDir)) {
+  throw new Error(
+    `Missing dist directory at ${distDir}. Run pnpm build first.`,
+  );
+}
+if (baseDistDir && !existsSync(baseDistDir)) {
+  throw new Error(`Missing VISUAL_BASE_DIR at ${baseDistDir}.`);
+}
+
+function normalizeBase(value) {
+  if (!value || value === "/") return "/";
+  const withLeading = value.startsWith("/") ? value : `/${value}`;
+  return withLeading.endsWith("/") ? withLeading : `${withLeading}/`;
+}
+
+function contentTypeForPath(pathname) {
+  if (pathname.endsWith(".html")) return "text/html; charset=utf-8";
+  if (pathname.endsWith(".css")) return "text/css; charset=utf-8";
+  if (pathname.endsWith(".js")) return "text/javascript; charset=utf-8";
+  if (pathname.endsWith(".svg")) return "image/svg+xml";
+  if (pathname.endsWith(".ico")) return "image/x-icon";
+  if (pathname.endsWith(".woff2")) return "font/woff2";
+  if (pathname.endsWith(".woff")) return "font/woff";
+  if (pathname.endsWith(".xml")) return "application/xml; charset=utf-8";
+  if (pathname.endsWith(".txt")) return "text/plain; charset=utf-8";
+  if (pathname.endsWith(".png")) return "image/png";
+  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) {
+    return "image/jpeg";
+  }
+  return "application/octet-stream";
+}
+
+function stripBase(urlPath, pathPrefix) {
+  if (pathPrefix === "/") return urlPath;
+  if (urlPath === pathPrefix.slice(0, -1)) return "/";
+  if (urlPath.startsWith(pathPrefix)) {
+    return `/${urlPath.slice(pathPrefix.length)}`;
+  }
+  return urlPath;
+}
+
+function normalizePathname(root, pathPrefix, urlPath) {
+  const cleaned = stripBase(
+    urlPath.replace(/\?.*$/, "").replace(/\/+$/, ""),
+    pathPrefix,
+  );
+  if (cleaned === "" || cleaned === "/") return "/index.html";
+  if (cleaned.endsWith(".html")) return cleaned;
+  const asDir = `${cleaned}/index.html`;
+  if (existsSync(path.join(root, asDir))) return asDir;
+  const asFile = `${cleaned}.html`;
+  if (existsSync(path.join(root, asFile))) return asFile;
+  return cleaned.startsWith("/") ? cleaned : `/${cleaned}`;
+}
+
+function collectHtmlRoutes(dir = distDir, prefix = "") {
+  const entries = readdirSync(dir, { withFileTypes: true });
+  const routes = [];
+  for (const entry of entries) {
+    if (entry.name.startsWith(".")) continue;
+    const full = path.join(dir, entry.name);
+    const rel = path.posix.join(prefix, entry.name);
+    if (entry.isDirectory()) {
+      // Skip Decap admin and the hosted visual report folder itself.
+      if (entry.name === "admin" || entry.name === "visual") continue;
+      routes.push(...collectHtmlRoutes(full, rel));
+      continue;
+    }
+    if (!entry.name.endsWith(".html")) continue;
+    if (entry.name === "404.html") {
+      routes.push({ file: rel, urlPath: "404" });
+      continue;
+    }
+    if (entry.name === "index.html") {
+      const route = prefix === "" ? "" : prefix;
+      routes.push({ file: rel, urlPath: route });
+      continue;
+    }
+    routes.push({
+      file: rel,
+      urlPath: rel.replace(/\.html$/, ""),
+    });
+  }
+  return routes;
+}
+
+function routeSlug(urlPath) {
+  if (!urlPath || urlPath === "") return "home";
+  return urlPath.replaceAll("/", "-").replace(/^-|-$/g, "") || "home";
+}
+
+function publicUrl(urlPath) {
+  if (!urlPath) return basePath === "/" ? "/" : basePath;
+  const suffix = urlPath.startsWith("/") ? urlPath.slice(1) : urlPath;
+  if (basePath === "/") return `/${suffix}`;
+  return `${basePath}${suffix}`;
+}
+
+function sitePath(urlPath) {
+  if (!urlPath || urlPath === "") return "/";
+  return urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
+}
+
+function createStaticServer(root, pathPrefix) {
+  return http.createServer(async (req, res) => {
+    try {
+      if (!req.url) {
+        res.statusCode = 400;
+        res.end("Bad request");
+        return;
+      }
+
+      const pathname = normalizePathname(root, pathPrefix, req.url);
+      const fsPath = path.join(root, pathname);
+
+      if (!existsSync(fsPath)) {
+        const notFound = path.join(root, "404.html");
+        if (existsSync(notFound)) {
+          res.statusCode = 404;
+          res.setHeader("Content-Type", "text/html; charset=utf-8");
+          res.end(await readFile(notFound));
+          return;
+        }
+        res.statusCode = 404;
+        res.end("Not found");
+        return;
+      }
+
+      res.setHeader("Content-Type", contentTypeForPath(pathname));
+      if (
+        pathname.endsWith(".html") ||
+        pathname.endsWith(".css") ||
+        pathname.endsWith(".js") ||
+        pathname.endsWith(".xml") ||
+        pathname.endsWith(".txt") ||
+        pathname.endsWith(".svg")
+      ) {
+        res.end(await readFile(fsPath));
+        return;
+      }
+
+      createReadStream(fsPath).pipe(res);
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(String(err));
+    }
+  });
+}
+
+async function listen(server, preferredPort = 0) {
+  await new Promise((resolve) =>
+    server.listen(preferredPort, "127.0.0.1", resolve),
+  );
+  const actual = server.address()?.port;
+  assert.ok(typeof actual === "number" && actual > 0, "Failed to pick a port");
+  return actual;
+}
+
+function installTurnstileStub() {
+  window.turnstile = {
+    render(container, options) {
+      if (container instanceof HTMLElement) {
+        container.dataset.turnstileStub = "true";
+      }
+      const callback = options?.callback;
+      if (typeof callback === "function") {
+        queueMicrotask(() => callback("visual-turnstile-token"));
+      }
+      return "visual-stub";
+    },
+    reset() {},
+    remove() {},
+  };
+}
+
+async function screenshotPage(
+  browser,
+  url,
+  viewport,
+  filePath,
+  { allowNotFound = false, prepare = null } = {},
+) {
+  const context = await browser.newContext({
+    viewport: { width: viewport.width, height: viewport.height },
+    deviceScaleFactor: 1,
+  });
+  await context.addInitScript(installTurnstileStub);
+  const page = await context.newPage();
+  try {
+    const response = await page.goto(url, {
+      waitUntil: "load",
+      timeout: 45_000,
+    });
+    const status = response?.status() ?? 0;
+    if (!response || status >= 500) {
+      return { ok: false, status };
+    }
+    if (status >= 400 && !(allowNotFound && status === 404)) {
+      return { ok: false, status };
+    }
+    if (prepare) {
+      await prepare(page);
+    }
+    await page.screenshot({
+      path: filePath,
+      fullPage: true,
+      animations: "disabled",
+    });
+    return { ok: true, status };
+  } finally {
+    await context.close();
+  }
+}
+
+async function waitForWaitlistForm(page) {
+  await page.locator("#waitlist-form").waitFor();
+  await page
+    .locator("#waitlist-form button[type='submit']:not([disabled])")
+    .waitFor({
+      timeout: 15_000,
+    });
+}
+
+async function waitForContactForm(page) {
+  await page.locator("#contact-form").waitFor();
+  await page
+    .locator("#contact-form button[type='submit']:not([disabled])")
+    .waitFor({
+      timeout: 15_000,
+    });
+}
+
+function ensureWaitlistDist() {
+  const out = path.join(rootDir, "test-results", "dist-waitlist-on");
+  mkdirSync(path.dirname(out), { recursive: true });
+  const result = spawnSync(
+    "pnpm",
+    ["exec", "astro", "build", "--outDir", out],
+    {
+      cwd: rootDir,
+      env: {
+        ...process.env,
+        PUBLIC_LEAD_INTAKE_ENABLED: "true",
+        PUBLIC_TURNSTILE_SITE_KEY:
+          process.env.PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
+      },
+      stdio: "inherit",
+    },
+  );
+  if (result.status !== 0) {
+    throw new Error("Failed to build waitlist-on dist for visual captures.");
+  }
+  return out;
+}
+
+function padPng(img, width, height) {
+  if (img.width === width && img.height === height) return img;
+  const out = new PNG({ width, height });
+  out.data.fill(0);
+  for (let y = 0; y < img.height; y++) {
+    for (let x = 0; x < img.width; x++) {
+      const src = (img.width * y + x) << 2;
+      const dst = (width * y + x) << 2;
+      out.data[dst] = img.data[src];
+      out.data[dst + 1] = img.data[src + 1];
+      out.data[dst + 2] = img.data[src + 2];
+      out.data[dst + 3] = img.data[src + 3];
+    }
+  }
+  return out;
+}
+
+function diffPngs(baseFilePath, prFilePath, diffFilePath) {
+  const baseImg = PNG.sync.read(readFileSync(baseFilePath));
+  const prImg = PNG.sync.read(readFileSync(prFilePath));
+  const width = Math.max(baseImg.width, prImg.width);
+  const height = Math.max(baseImg.height, prImg.height);
+  const baseNorm = padPng(baseImg, width, height);
+  const prNorm = padPng(prImg, width, height);
+  const diff = new PNG({ width, height });
+  const mismatched = pixelmatch(
+    baseNorm.data,
+    prNorm.data,
+    diff.data,
+    width,
+    height,
+    { threshold: 0.1 },
+  );
+  mkdirSync(path.dirname(diffFilePath), { recursive: true });
+  writeFileSync(diffFilePath, PNG.sync.write(diff));
+  return mismatched;
+}
+
+await rm(outDir, { recursive: true, force: true });
+for (const dir of ["pr", "base", "diff"]) {
+  mkdirSync(path.join(outDir, dir), { recursive: true });
+}
+
+const prServer = createStaticServer(distDir, basePath);
+const prPort = await listen(prServer, port);
+const prOrigin = `http://127.0.0.1:${prPort}`;
+
+let baseOrigin = null;
+let baseServer = null;
+if (!skipBase && baseDistDir) {
+  baseServer = createStaticServer(baseDistDir, basePath);
+  const basePort = await listen(baseServer, 0);
+  baseOrigin = `http://127.0.0.1:${basePort}`;
+}
+
+const waitlistDist = ensureWaitlistDist();
+const waitlistServer = createStaticServer(waitlistDist, basePath);
+const waitlistPort = await listen(waitlistServer, 0);
+const waitlistOrigin = `http://127.0.0.1:${waitlistPort}`;
+
+const routes = collectHtmlRoutes();
+assert.ok(routes.length > 0, "Expected at least one HTML route in dist/");
+
+const VIEWPORTS = {
+  desktop: { name: "desktop", width: 1440, height: 900 },
+  mobile: { name: "mobile", width: 390, height: 844 },
+  "mobile-375": { name: "mobile-375", width: 375, height: 812 },
+};
+const defaultViewports = [
+  VIEWPORTS.desktop,
+  VIEWPORTS.mobile,
+  VIEWPORTS["mobile-375"],
+];
+
+const routeCaptures = routes.map((route) => ({
+  origin: prOrigin,
+  urlPath: route.urlPath,
+  query: "",
+  id: routeSlug(route.urlPath),
+  viewports: defaultViewports,
+  compareBase: true,
+  prepare: null,
+}));
+
+const stateCaptures = [
+  {
+    origin: prOrigin,
+    urlPath: "",
+    query: "",
+    id: "home-hover-primary",
+    viewports: [VIEWPORTS.desktop],
+    compareBase: false,
+    prepare: async (page) => {
+      await page.locator("a.bg-accent").first().hover();
+    },
+  },
+  {
+    origin: prOrigin,
+    urlPath: "",
+    query: "",
+    id: "home-focus-primary",
+    viewports: [VIEWPORTS.desktop],
+    compareBase: false,
+    prepare: async (page) => {
+      await page.locator("a.bg-accent").first().focus();
+    },
+  },
+  {
+    origin: prOrigin,
+    urlPath: "",
+    query: "",
+    id: "home-mobile-menu",
+    viewports: [VIEWPORTS.mobile, VIEWPORTS["mobile-375"]],
+    compareBase: false,
+    prepare: async (page) => {
+      await page.locator("[data-mobile-nav-toggle]").click();
+      await page.locator("[data-mobile-nav]:not([hidden])").waitFor();
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "waitlist",
+    query: "",
+    id: "waitlist-idle",
+    viewports: defaultViewports,
+    compareBase: false,
+    prepare: async (page) => {
+      await waitForWaitlistForm(page);
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "waitlist",
+    query: "",
+    id: "waitlist-focus",
+    viewports: [VIEWPORTS.desktop],
+    compareBase: false,
+    prepare: async (page) => {
+      await waitForWaitlistForm(page);
+      await page.locator("#waitlist-name").focus();
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "waitlist",
+    query: "",
+    id: "waitlist-invalid",
+    viewports: [VIEWPORTS.desktop, VIEWPORTS.mobile],
+    compareBase: false,
+    prepare: async (page) => {
+      await waitForWaitlistForm(page);
+      await page.locator("#waitlist-form button[type='submit']").click();
+      await page.locator("#waitlist-name[aria-invalid='true']").waitFor();
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "waitlist",
+    query: "",
+    id: "waitlist-hover-submit",
+    viewports: [VIEWPORTS.desktop],
+    compareBase: false,
+    prepare: async (page) => {
+      await waitForWaitlistForm(page);
+      await page.locator("#waitlist-form button[type='submit']").hover();
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "waitlist",
+    query: "",
+    id: "waitlist-success",
+    viewports: [VIEWPORTS.desktop],
+    compareBase: false,
+    prepare: async (page) => {
+      await page.route(
+        "https://api.singletonsd.com/v1/leads",
+        async (route) => {
+          await route.fulfill({
+            status: 202,
+            contentType: "application/json",
+            body: JSON.stringify({ id: "visual-lead" }),
+          });
+        },
+      );
+      await waitForWaitlistForm(page);
+      await page.locator("#waitlist-name").fill("Ada Lovelace");
+      await page.locator("#waitlist-email").fill("ada@example.com");
+      await page.locator("#waitlist-feature").selectOption("early_access");
+      await page.locator("#waitlist-consent").check();
+      await page.locator("#waitlist-form button[type='submit']").click();
+      await page.locator("#waitlist-success:not(.hidden)").waitFor();
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "contact",
+    query: "",
+    id: "contact-idle",
+    viewports: defaultViewports,
+    compareBase: false,
+    prepare: async (page) => {
+      await waitForContactForm(page);
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "contact",
+    query: "",
+    id: "contact-focus",
+    viewports: [VIEWPORTS.desktop],
+    compareBase: false,
+    prepare: async (page) => {
+      await waitForContactForm(page);
+      await page.locator("#contact-name").focus();
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "contact",
+    query: "",
+    id: "contact-invalid",
+    viewports: [VIEWPORTS.desktop, VIEWPORTS.mobile],
+    compareBase: false,
+    prepare: async (page) => {
+      await waitForContactForm(page);
+      await page.locator("#contact-form button[type='submit']").click();
+      await page.locator("#contact-name[aria-invalid='true']").waitFor();
+    },
+  },
+  {
+    origin: waitlistOrigin,
+    urlPath: "contact",
+    query: "",
+    id: "contact-success",
+    viewports: [VIEWPORTS.desktop],
+    compareBase: false,
+    prepare: async (page) => {
+      await page.route(
+        "https://api.singletonsd.com/v1/leads",
+        async (route) => {
+          await route.fulfill({
+            status: 202,
+            contentType: "application/json",
+            body: JSON.stringify({ id: "visual-contact" }),
+          });
+        },
+      );
+      await waitForContactForm(page);
+      await page.locator("#contact-name").fill("Ada Lovelace");
+      await page.locator("#contact-email").fill("ada@example.com");
+      await page.locator("#contact-subject").selectOption("sales");
+      await page.locator("#contact-message").fill("Please follow up.");
+      await page.locator("#contact-consent").check();
+      await page.locator("#contact-form button[type='submit']").click();
+      await page.locator("#contact-success:not(.hidden)").waitFor();
+    },
+  },
+];
+
+const browser = await chromium.launch();
+const manifest = [];
+
+try {
+  for (const capture of [...routeCaptures, ...stateCaptures]) {
+    for (const viewport of capture.viewports) {
+      const slug = `${capture.id}-${viewport.name}`;
+      const prRel = `pr/${slug}.png`;
+      const baseRel = `base/${slug}.png`;
+      const diffRel = `diff/${slug}.png`;
+      const prFile = path.join(outDir, prRel);
+      const baseFile = path.join(outDir, baseRel);
+      const diffFile = path.join(outDir, diffRel);
+
+      const pathWithQuery = `${publicUrl(capture.urlPath)}${capture.query}`;
+      const prUrl = `${capture.origin}${pathWithQuery}`;
+      const prShot = await screenshotPage(browser, prUrl, viewport, prFile, {
+        prepare: capture.prepare,
+      });
+      assert.ok(
+        prShot.ok && prShot.status < 400,
+        `Failed to load PR route ${prUrl}: ${prShot.status}`,
+      );
+
+      let baseOk = false;
+      let baseMissing = false;
+      let mismatched = 0;
+      let baseUrl = null;
+      if (!skipBase && capture.compareBase) {
+        baseUrl = baseOrigin
+          ? `${baseOrigin}${publicUrl(capture.urlPath)}${capture.query}`
+          : `${baseSiteUrl}${sitePath(capture.urlPath)}${capture.query}`;
+        const baseShot = await screenshotPage(
+          browser,
+          baseUrl,
+          viewport,
+          baseFile,
+          { allowNotFound: true },
+        );
+        baseOk = baseShot.ok;
+        baseMissing = baseOk && baseShot.status === 404;
+        if (!baseOk) {
+          await rm(baseFile, { force: true });
+        } else {
+          mismatched = diffPngs(baseFile, prFile, diffFile);
+          if (mismatched === 0) {
+            await rm(diffFile, { force: true });
+          }
+        }
+      }
+
+      const status = !baseOk
+        ? "new"
+        : baseMissing
+          ? "new"
+          : mismatched > 0
+            ? "changed"
+            : "unchanged";
+
+      const routeLabel = capture.compareBase
+        ? `${capture.urlPath || "/"}${capture.query}`
+        : `state:${capture.id}`;
+      manifest.push({
+        route: routeLabel,
+        viewport: viewport.name,
+        prFile: prRel,
+        baseFile: baseOk ? baseRel : null,
+        diffFile: mismatched > 0 ? diffRel : null,
+        mismatched: mismatched > 0 ? mismatched : 0,
+        prUrl: pathWithQuery,
+        baseUrl: skipBase || !capture.compareBase ? null : baseUrl,
+        status,
+      });
+    }
+  }
+} finally {
+  await browser.close();
+  prServer.close();
+  waitlistServer.close();
+  baseServer?.close();
+}
+
+const changedRoutes = [
+  ...new Set(
+    manifest.filter((m) => m.status === "changed").map((m) => m.route),
+  ),
+].sort();
+const newRoutes = [
+  ...new Set(manifest.filter((m) => m.status === "new").map((m) => m.route)),
+].sort();
+const unchanged = manifest.filter((m) => m.status === "unchanged").length;
+const summary = {
+  total: manifest.length,
+  unchanged,
+  changed: changedRoutes.length,
+  new: newRoutes.length,
+  changedRoutes,
+  newRoutes,
+  hasDiffs: changedRoutes.length > 0 || newRoutes.length > 0,
+};
+
+await writeFile(
+  path.join(outDir, "manifest.json"),
+  `${JSON.stringify(
+    {
+      basePath,
+      headSha,
+      baseSha: skipBase ? null : baseSha,
+      baseLabel: skipBase ? null : baseLabel,
+      baseSiteUrl: skipBase || baseDistDir ? null : baseSiteUrl,
+      baseDistDir: skipBase ? null : baseDistDir,
+      summary,
+      routes: manifest,
+    },
+    null,
+    2,
+  )}\n`,
+  "utf8",
+);
+await writeFile(
+  path.join(outDir, "index.html"),
+  buildReportHtml(manifest, { baseLabel }),
+);
+
+console.log(
+  `Visual screenshots: ${summary.total} comparisons → ${outDir} (${summary.changed} changed routes, ${summary.new} new routes). Open index.html`,
+);
